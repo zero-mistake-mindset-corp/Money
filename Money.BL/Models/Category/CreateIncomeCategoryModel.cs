@@ -1,7 +1,6 @@
-namespace Money.BL.Models.Category
+namespace Money.BL.Models.Category;
+
+public class CreateIncomeCategoryModel
 {
-    public class CreateIncomeCategoryModel
-    {
-        public string CategoryName {get;set;}
-    }
+    public string CategoryName { get; set; }
 }
