@@ -14,5 +14,4 @@ public class AppDbContext : DbContext
     public DbSet<MoneyAccountEntity> MoneyAccounts { get; set; }
     public DbSet<IncomeTypeEntity> IncomeTypes { get; set; }
     public DbSet<ExpenseTypeEntity> ExpenseTypes { get; set; }
-    public DbSet<IncomeCategoryEntity> IncomeCategories { get; set; }
 }

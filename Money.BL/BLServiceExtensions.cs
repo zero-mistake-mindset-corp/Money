@@ -15,6 +15,7 @@ public static class BLServiceExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IMoneyAccountService, MoneyAccountService>();
+        services.AddScoped<IIncomeTypeService, IncomeTypeService>();
         return services;
     }
 }

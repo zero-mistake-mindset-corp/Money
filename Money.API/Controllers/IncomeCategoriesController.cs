@@ -1,19 +1,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Money.BL.Interfaces;
-using Money.BL.Interfaces.Category;
 using Money.BL.Models.Category;
 
-namespace Money.API.Controllers.Category;
+namespace Money.API.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class IncomeCategoryController : ControllerBase 
+public class IncomeCategoriesController : ControllerBase
 {
     private readonly ICurrentUserService _currentUserService;
-    private readonly IIncomeCategoryService _incomeCategoryService;
+    private readonly IIncomeTypeService _incomeCategoryService;
 
-    public IncomeCategoryController(ICurrentUserService currentUserService, IIncomeCategoryService incomeCategoryService)
+    public IncomeCategoriesController(ICurrentUserService currentUserService, IIncomeTypeService incomeCategoryService)
     {
         _currentUserService = currentUserService;
         _incomeCategoryService = incomeCategoryService;
@@ -21,7 +20,7 @@ public class IncomeCategoryController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> CreateIncomeCategory(CreateIncomeCategoryModel model)
+    public async Task<IActionResult> CreateIncomeCategory(CreateIncomeTypeModel model)
     {
         var userId = _currentUserService.GetUserId();
         await _incomeCategoryService.CreateIncomeCategoryAsync(model, userId);
