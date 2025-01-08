@@ -1,4 +1,4 @@
-namespace Money.BL.Models.Category;
+namespace Money.BL.Models.Type;
 
 public class CreateIncomeTypeModel
 {
