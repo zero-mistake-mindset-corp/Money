@@ -7,12 +7,12 @@ namespace Money.API.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class ExpenseTypeController : ControllerBase
+public class ExpenseTypesController : ControllerBase
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IExpenseTypeService _expenseTypeService;
 
-    public ExpenseTypeController (ICurrentUserService currentUserService, IExpenseTypeService expenseTypeService)
+    public ExpenseTypesController (ICurrentUserService currentUserService, IExpenseTypeService expenseTypeService)
     {
         _currentUserService = currentUserService;
         _expenseTypeService = expenseTypeService;

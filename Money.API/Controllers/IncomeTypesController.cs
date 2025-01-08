@@ -4,15 +4,15 @@ using Money.BL.Interfaces;
 using Money.BL.Models.Type;
 
 namespace Money.API.Controllers;
-
+ 
 [Route("[controller]")]
 [ApiController]
-public class IncomeTypeController : ControllerBase
+public class IncomeTypesController : ControllerBase
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly IIncomeTypeService _incomeTypeService;
 
-    public IncomeTypeController(ICurrentUserService currentUserService, IIncomeTypeService incomeTypeService)
+    public IncomeTypesController(ICurrentUserService currentUserService, IIncomeTypeService incomeTypeService)
     {
         _currentUserService = currentUserService;
         _incomeTypeService = incomeTypeService;
@@ -38,19 +38,19 @@ public class IncomeTypeController : ControllerBase
 
     [HttpPut]
     [Authorize]
-    public async Task<IActionResult> UpdateIncomeType(Guid categoryId, string newCategoryName)
+    public async Task<IActionResult> UpdateIncomeType(Guid incomeTypeId, string newIncomeTypeName)
     {
         var userId = _currentUserService.GetUserId();
-        await _incomeTypeService.UpdateIncomeTypeAsync(categoryId, userId, newCategoryName);
+        await _incomeTypeService.UpdateIncomeTypeAsync(incomeTypeId, userId, newIncomeTypeName);
         return Ok();
     }
 
     [HttpDelete]
     [Authorize]
-    public async Task<IActionResult> DeleteIncomeType(Guid categoryId)
+    public async Task<IActionResult> DeleteIncomeType(Guid incomeTypeId)
     {
         var userId = _currentUserService.GetUserId();
-        await _incomeTypeService.DeleteIncomeTypeAsync(categoryId, userId);
+        await _incomeTypeService.DeleteIncomeTypeAsync(incomeTypeId, userId);
         return Ok();
     }
 }
