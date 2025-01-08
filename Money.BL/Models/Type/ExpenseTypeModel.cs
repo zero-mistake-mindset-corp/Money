@@ -1,6 +1,6 @@
-namespace Money.BL.Models.Category;
+namespace Money.BL.Models.Type;
 
-public class IncomeTypeModel
+public class ExpenseTypeModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; }

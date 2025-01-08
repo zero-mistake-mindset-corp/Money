@@ -1,4 +1,4 @@
-using Money.BL.Models.Category;
+using Money.BL.Models.Type;
 using Money.Data;
 using Money.Common.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +16,7 @@ public class IncomeTypeService : IIncomeTypeService
         _context = context;
     }
 
-    public async Task CreateIncomeCategoryAsync(CreateIncomeTypeModel model, Guid userId)
+    public async Task CreateIncomeTypeAsync(CreateIncomeTypeModel model, Guid userId)
     {
         Validator.ValidateString(model.Name);
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
@@ -31,7 +31,7 @@ public class IncomeTypeService : IIncomeTypeService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<IncomeTypeModel>> GetAllIncomeCategoriesAsync(Guid userId)
+    public async Task<List<IncomeTypeModel>> GetAllIncomeTypesAsync(Guid userId)
     {
         var incomeTypes = await _context.IncomeTypes.AsNoTracking().Where(it => it.UserId == userId)
             .Select(it => new IncomeTypeModel
@@ -43,7 +43,7 @@ public class IncomeTypeService : IIncomeTypeService
         return incomeTypes;
     }
 
-    public async Task UpdateIncomeCategoryAsync(Guid incomeTypeId, Guid userId, string newIncomeTypeName)
+    public async Task UpdateIncomeTypeAsync(Guid incomeTypeId, Guid userId, string newIncomeTypeName)
     {
         Validator.ValidateString(newIncomeTypeName);
         var incomeType = await _context.IncomeTypes.Where(it => it.Id == incomeTypeId && it.UserId == userId).FirstOrDefaultAsync();
@@ -52,7 +52,7 @@ public class IncomeTypeService : IIncomeTypeService
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteIncomeCategoryAsync(Guid userId, Guid incomeTypeId)
+    public async Task DeleteIncomeTypeAsync(Guid userId, Guid incomeTypeId)
     {
         await _context.IncomeTypes.Where(it => it.Id == incomeTypeId && it.UserId == userId).ExecuteDeleteAsync();
     }

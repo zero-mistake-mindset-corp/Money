@@ -1,11 +1,11 @@
-using Money.BL.Models.Category;
+using Money.BL.Models.Type;
 
 namespace Money.BL.Interfaces;
 
 public interface IIncomeTypeService
 {
-    Task<List<IncomeTypeModel>> GetAllIncomeCategoriesAsync(Guid userId);
-    Task CreateIncomeCategoryAsync(CreateIncomeTypeModel model, Guid userId);
-    Task UpdateIncomeCategoryAsync(Guid userId, Guid incomeTypeId, string newIncomeTypeName);
-    Task DeleteIncomeCategoryAsync(Guid userId, Guid incomeTypeId);
+    Task<List<IncomeTypeModel>> GetAllIncomeTypesAsync(Guid userId);
+    Task CreateIncomeTypeAsync(CreateIncomeTypeModel model, Guid userId);
+    Task UpdateIncomeTypeAsync(Guid userId, Guid incomeTypeId, string newIncomeTypeName);
+    Task DeleteIncomeTypeAsync(Guid userId, Guid incomeTypeId);
 }
