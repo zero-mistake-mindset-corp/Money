@@ -1,0 +1,17 @@
+name: CI Build
+
+on:
+  pull_request:
+    branches: [ "dev", "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+        
