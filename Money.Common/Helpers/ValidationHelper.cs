@@ -12,17 +12,11 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateSignUpData(string username, string password)
+    public static void ValidateSignUpData(string username, string password, string email)
     {
-        if (string.IsNullOrEmpty(username) 
-            || string.IsNullOrEmpty(password)
-            || username.Length == 0
-            || username.Length >= 50
-            || password.Length <= 3
-            || password.Length >= 100)
-        {
-            throw new InvalidInputException("Invalid username or password.");
-        }
+        BaseValidator.ValidateString(username, maxLength: 50);
+        BaseValidator.ValidatePassword(password);
+        BaseValidator.ValidateEmail(email);
     }
 
     public static void EnsureEntityFound<T>(T entity) where T : class
@@ -32,7 +26,6 @@ public static class ValidationHelper
             throw new NotFoundException("Not found.");
         }
     }
-
     public static void ValidateRefreshToken(DateTime refreshTokenExpiration)
     {
         if (refreshTokenExpiration < DateTime.UtcNow)

@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Money.BL.Interfaces.Auth;
+using Money.BL.Interfaces.Infrastructure;
 using Money.BL.Models.Auth;
+using Money.BL.Models.Email;
+using Money.Common;
 using Money.Common.Exceptions;
 using Money.Common.Helpers;
 using Money.Data;
@@ -12,12 +15,14 @@ public class AuthService : IAuthService
 {
     private readonly ITokenService _tokenService;
     private readonly AppDbContext _context;
-    private const int REFRESH_TOKEN_EXPIRATION = 30;
+    private readonly IEmailService _emailService;
+    private const int REFRESH_TOKEN_EXPIRATION_DAYS = 30;
 
-    public AuthService(ITokenService tokenService, AppDbContext context)
+    public AuthService(ITokenService tokenService, AppDbContext context, IEmailService emailService)
     {
         _tokenService = tokenService;
         _context = context;
+        _emailService = emailService;
     }
 
     public async Task<TokensInfo> SignInAsync(SignInModel signInModel)
@@ -32,19 +37,36 @@ public class AuthService : IAuthService
 
     public async Task SignUpAsync(SignUpModel signUpModel)
     {
-        ValidationHelper.ValidateSignUpData(signUpModel.Username, signUpModel.Password);
-        EnsureUserDoesNotExistAsync(signUpModel.Username);
+        ValidationHelper.ValidateSignUpData(signUpModel.Username, signUpModel.Password, signUpModel.Email);
+        EnsureUserDoesNotExist(signUpModel.Email);
 
-        var passwordHash = InformationHasher.HashText(signUpModel.Password);
+        var code = new ConfirmationCodeEntity
+        {
+            Value = CodeCreator.GenerateCode(),
+            IsUsed = false,
+            Expiration = DateTime.UtcNow.AddMinutes(5),
+            Metadata = ConfirmationCodeMetadata.EmailConfirmation
+        };
 
         var userEntity = new UserEntity
         {
             Username = signUpModel.Username,
-            PasswordHash = passwordHash
+            Email = signUpModel.Email,
+            IsEmailConfirmed = false,
+            IsTwoFactorAuthEnabled = true,
+            PasswordHash = InformationHasher.HashText(signUpModel.Password),
+            ConfirmationCodes = new List<ConfirmationCodeEntity> { code }
+        };
+
+        var emailModel = new EmailTemplateModel
+        {
+            UserName = signUpModel.Username,
+            Code = code.Value
         };
 
         _context.Users.Add(userEntity);
         await _context.SaveChangesAsync();
+        await _emailService.SendAsync(userEntity.Email, EmailTemplateType.EmailConfirmation, emailModel);
     }
 
     public async Task<TokensInfo> RefreshTokensAsync(string refreshToken)
@@ -64,7 +86,7 @@ public class AuthService : IAuthService
     {
         var accessTokenInfo = _tokenService.GenerateAccessToken(user.Id);
         var refreshTokenValue = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiryTime = DateTime.UtcNow.AddDays(REFRESH_TOKEN_EXPIRATION);
+        var refreshTokenExpiryTime = DateTime.UtcNow.AddDays(REFRESH_TOKEN_EXPIRATION_DAYS);
 
         var refreshTokenEntity = new RefreshTokenEntity
         {
@@ -86,11 +108,11 @@ public class AuthService : IAuthService
         return tokensInfo;
     }
 
-    private void EnsureUserDoesNotExistAsync(string username)
+    private void EnsureUserDoesNotExist(string email)
     {
-        if (_context.Users.Any(u => u.Username == username))
+        if (_context.Users.Any(u => u.Email == email))
         {
-            throw new EntityExistsException("Данный username уже занят.");
+            throw new EntityExistsException("User with this email already exists.");
         }
     }
 }

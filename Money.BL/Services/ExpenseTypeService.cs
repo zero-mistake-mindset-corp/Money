@@ -18,7 +18,7 @@ public class ExpenseTypeService : IExpenseTypeService
 
     public async Task CreateExpenseTypeAsync(CreateExpenseTypeModel model, Guid userId)
     {
-        Validator.ValidateString(model.Name);
+        BaseValidator.ValidateString(model.Name);
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
         ValidationHelper.EnsureEntityFound(user);
         var newExpenseType = new ExpenseTypeEntity
@@ -45,7 +45,7 @@ public class ExpenseTypeService : IExpenseTypeService
 
     public async Task UpdateExpenseTypeAsync(Guid userId, Guid expenseTypeId, string newExpenseTypeName)
     {
-        Validator.ValidateString(newExpenseTypeName);
+        BaseValidator.ValidateString(newExpenseTypeName);
         var expenseType = await _context.ExpenseTypes.Where(et => et.Id == expenseTypeId && et.UserId == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(expenseType);
         expenseType.Name = newExpenseTypeName;
