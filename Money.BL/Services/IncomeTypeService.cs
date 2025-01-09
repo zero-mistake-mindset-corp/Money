@@ -19,6 +19,12 @@ public class IncomeTypeService : IIncomeTypeService
     public async Task CreateIncomeTypeAsync(CreateIncomeTypeModel model, Guid userId)
     {
         Validator.ValidateString(model.Name);
+         bool isDuplicate = await _context.IncomeTypes
+            .AsNoTracking()
+            .AnyAsync(it => it.Name == model.Name && it.UserId == userId);
+        if (isDuplicate)
+            throw new InvalidOperationException("Income category with this name already exists");
+
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
         ValidationHelper.EnsureEntityFound(user);
         var newIncomeType = new IncomeTypeEntity

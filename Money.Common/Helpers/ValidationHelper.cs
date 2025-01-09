@@ -54,11 +54,11 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateBalance(decimal balance)
+    public static void ValidateNonNegative(decimal balance)
     {
         if (balance < 0)
         {
-            throw new InvalidInputException("Balance < 0");
+            throw new InvalidInputException("Money value cannot be negative.");
         }
     }
 }

@@ -19,14 +19,21 @@ public class ExpenseTypeService : IExpenseTypeService
     public async Task CreateExpenseTypeAsync(CreateExpenseTypeModel model, Guid userId)
     {
         Validator.ValidateString(model.Name);
+        bool isDuplicate = await _context.ExpenseTypes
+            .AsNoTracking()
+            .AnyAsync(et => et.Name == model.Name && et.UserId == userId);
+        if (isDuplicate)
+            throw new InvalidOperationException("Expense category with this name already exists");
+        
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
         ValidationHelper.EnsureEntityFound(user);
+
         var newExpenseType = new ExpenseTypeEntity
         {
             Name = model.Name,
             UserId = userId
         };
-
+       
         await _context.ExpenseTypes.AddAsync(newExpenseType);
         await _context.SaveChangesAsync();
     }

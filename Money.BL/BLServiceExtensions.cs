@@ -16,6 +16,8 @@ public static class BLServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IMoneyAccountService, MoneyAccountService>();
         services.AddScoped<IIncomeTypeService, IncomeTypeService>();
+        services.AddScoped<IExpenseTypeService, ExpenseTypeService>();
+        services.AddScoped<IIncomeTransactionService, IncomeTransactionService>();
         return services;
     }
 }
