@@ -1,4 +1,4 @@
-﻿using Money.BL.Models.Account;
+﻿using Money.BL.Models.MoneyAccount;
 
 namespace Money.BL.Interfaces;
 

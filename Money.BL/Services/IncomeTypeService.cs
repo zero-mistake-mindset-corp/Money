@@ -18,7 +18,7 @@ public class IncomeTypeService : IIncomeTypeService
 
     public async Task CreateIncomeTypeAsync(CreateIncomeTypeModel model, Guid userId)
     {
-        Validator.ValidateString(model.Name);
+        BaseValidator.ValidateString(model.Name);
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
         ValidationHelper.EnsureEntityFound(user);
         var newIncomeType = new IncomeTypeEntity
@@ -45,7 +45,7 @@ public class IncomeTypeService : IIncomeTypeService
 
     public async Task UpdateIncomeTypeAsync(Guid incomeTypeId, Guid userId, string newIncomeTypeName)
     {
-        Validator.ValidateString(newIncomeTypeName);
+        BaseValidator.ValidateString(newIncomeTypeName);
         var incomeType = await _context.IncomeTypes.Where(it => it.Id == incomeTypeId && it.UserId == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(incomeType);
         incomeType.Name = newIncomeTypeName;
