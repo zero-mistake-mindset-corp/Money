@@ -26,7 +26,7 @@ public class UserService : IUserService
     public async Task SignUpAsync(SignUpModel signUpModel)
     {
         ValidationHelper.ValidateSignUpData(signUpModel.Username, signUpModel.Password, signUpModel.Email);
-        EnsureUserDoesNotExist(signUpModel.Email);
+        EnsureUserDoesNotExist(signUpModel.Email, signUpModel.Username);
 
         var code = new ConfirmationCodeEntity
         {
@@ -102,12 +102,11 @@ public class UserService : IUserService
         await _emailService.SendAsync(user.Email, EmailTemplateType.EmailConfirmation, emailModel);
     }
 
-    //todo: the AuthService has the same method. Put it into a separate UserExistenceService
-    private void EnsureUserDoesNotExist(string email)
+    private void EnsureUserDoesNotExist(string email, string username)
     {
-        if (_context.Users.Any(u => u.Email == email))
+        if (_context.Users.Any(u => u.Email == email || u.Username == username || u.Email == username || u.Username == email))
         {
-            throw new EntityExistsException("User with this email already exists.");
+            throw new EntityExistsException("User with this username or email already exists.");
         }
     }
 }

@@ -28,9 +28,14 @@ public class AuthService : IAuthService
 
     public async Task<TokensInfo> SignInAsync(SignInModel signInModel)
     {
-        var user = await _context.Users.Include(u => u.RefreshTokens).FirstOrDefaultAsync(u => u.Email == signInModel.Email);
+        var user = await _context.Users.Include(u => u.RefreshTokens).FirstOrDefaultAsync(u => u.Email == signInModel.EmailOrUsername || u.Username == signInModel.EmailOrUsername);
         ValidationHelper.EnsureEntityFound(user);
         ValidationHelper.ValidateSignInData(user.PasswordHash, signInModel.Password);
+
+        if (user.IsEmailConfirmed == false)
+        {
+            throw new PermissionException("You must confirm your email to use app.");
+        }
 
         var tokens = await GenerateAndSaveTokensAsync(user);
         return tokens;
@@ -49,11 +54,16 @@ public class AuthService : IAuthService
         return tokens;
     }
 
-    public async Task<string> Send2FACodeAsync(string email, string password)
+    public async Task<string> Send2FACodeAsync(string emailOrUsername, string password)
     {
-        var user = await _context.Users.Include(u => u.ConfirmationCodes).FirstOrDefaultAsync(u => u.Email == email); 
+        var user = await _context.Users.Include(u => u.ConfirmationCodes).FirstOrDefaultAsync(u => u.Email == emailOrUsername || u.Username == emailOrUsername); 
         ValidationHelper.EnsureEntityFound(user);
         ValidationHelper.ValidateSignInData(user.PasswordHash, password);
+        if (user.IsEmailConfirmed == false)
+        {
+            throw new PermissionException("You must confirm your email to use app.");
+        }
+
         ConfirmationCodesInvalidator.InvalidatePreviousConfirmationCodes(user.ConfirmationCodes);
 
         var code = new ConfirmationCodeEntity
@@ -73,13 +83,18 @@ public class AuthService : IAuthService
         user.ConfirmationCodes.Add(code);
         await _context.SaveChangesAsync();
         await _emailService.SendAsync(user.Email, EmailTemplateType.TwoFactorAuth, emailTemplateModel);
-        return email;
+        return user.Email;
     }
 
-    public async Task<TokensInfo> SignInWithCodeAsync(string email, string password, string code)
+    public async Task<TokensInfo> SignInWithCodeAsync(string emailOrUsername, string password, string code)
     {
-        var user = await _context.Users.Include(u => u.ConfirmationCodes).Include(u => u.RefreshTokens).Where(u => u.Email == email).FirstOrDefaultAsync();
+        var user = await _context.Users.Include(u => u.ConfirmationCodes).Include(u => u.RefreshTokens).Where(u => u.Email == emailOrUsername || u.Username == emailOrUsername).FirstOrDefaultAsync();
         ValidationHelper.ValidateSignInData(user.PasswordHash, password);
+
+        if (user.IsEmailConfirmed == false)
+        {
+            throw new PermissionException("You must confirm your email to use app.");
+        }
 
         var userCode = user.ConfirmationCodes.FirstOrDefault(c => c.Value == code);
         if (userCode == null
@@ -95,9 +110,9 @@ public class AuthService : IAuthService
         return tokens;
     }
 
-    public async Task<bool> IsTwoFactorAuthEnabled(string email)
+    public async Task<bool> IsTwoFactorAuthEnabled(string emailOrUsername)
     {
-        var user = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+        var user = await _context.Users.Where(u => u.Email == emailOrUsername || u.Username == emailOrUsername).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
         var is2FAEnabled = user.IsTwoFactorAuthEnabled;
         return is2FAEnabled;

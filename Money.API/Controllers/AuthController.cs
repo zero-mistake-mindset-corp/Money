@@ -18,10 +18,10 @@ public class AuthController : ControllerBase
     [HttpPost("sign-in")]
     public async Task<IActionResult> SignIn(SignInModel signInModel)
     {
-        var is2FAEnabled = await _authService.IsTwoFactorAuthEnabled(signInModel.Email);
+        var is2FAEnabled = await _authService.IsTwoFactorAuthEnabled(signInModel.EmailOrUsername);
         if (is2FAEnabled)
         {
-            var notifyEmail = await _authService.Send2FACodeAsync(signInModel.Email, signInModel.Password);
+            var notifyEmail = await _authService.Send2FACodeAsync(signInModel.EmailOrUsername, signInModel.Password);
             return Accepted(notifyEmail);
         }
 
@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
     [HttpPost("sign-in/2fa")]
     public async Task<IActionResult> SignInWithCode(SignInWithCodeModel signInModel)
     {
-        var tokensInfo = await _authService.SignInWithCodeAsync(signInModel.Email, signInModel.Password, signInModel.Code);
+        var tokensInfo = await _authService.SignInWithCodeAsync(signInModel.EmailOrUsername, signInModel.Password, signInModel.Code);
         return Ok(tokensInfo);
     }
 
