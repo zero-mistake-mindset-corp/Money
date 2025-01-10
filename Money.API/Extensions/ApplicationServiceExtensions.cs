@@ -34,6 +34,10 @@ public static class ApplicationServiceExtensions
             configuration.GetSection(
                 key: nameof(JwtOptions)));
 
+        services.Configure<EmailOptions>(
+            configuration.GetSection(
+                key: nameof(EmailOptions)));
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {

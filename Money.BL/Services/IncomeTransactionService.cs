@@ -21,8 +21,6 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task CreateIncomeTransactionAsync(CreateIncomeTransactionModel model, Guid userId)
     {   
         ValidationHelper.ValidateNonNegative(model.Amount);
-        Validator.ValidateString(model.AccountName);
-        Validator.ValidateString(model.IncomeTypeName);
 
         var user = await _context.Users.AsNoTracking()
             .Include(u => u.MoneyAccounts)
@@ -31,20 +29,18 @@ public class IncomeTransactionService : IIncomeTransactionService
         ValidationHelper.EnsureEntityFound(user);
 
         var account = user.MoneyAccounts
-            .FirstOrDefault(acc => acc.Name == model.AccountName);
-        ValidationHelper.EnsureEntityFound(account);                     // not sure if these 2 checks are necessary
+            .FirstOrDefault(acc => acc.Id == model.AccountId);
+        ValidationHelper.EnsureEntityFound(account);                
 
         var incomeType = user.IncomeTypes
-            .FirstOrDefault(it => it.Name == model.IncomeTypeName);
+            .FirstOrDefault(it => it.Id == model.AccountId);
         ValidationHelper.EnsureEntityFound(incomeType);
 
         var newIncomeTransaction = new IncomeTransactionEntity
         {   
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
-            AccountName = model.AccountName,
             AccountId = account.Id,
-            IncomeTypeName = model.IncomeTypeName,
             IncomeTypeId = incomeType.Id
         };
 
@@ -72,8 +68,8 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Id = it.Id,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountName = it.AccountName,
-                IncomeTypeName = it.IncomeTypeName,
+                AccountId = it.AccountId,
+                IncomeTypeId = it.IncomeTypeId
             }).ToListAsync();
         return incomeTransactions;
     }

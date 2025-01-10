@@ -4,6 +4,6 @@ public class CreateIncomeTransactionModel
 {
     public DateTime TransactionDate { get; set; }
     public decimal Amount { get; set; }
-    public string AccountName { get; set; }
-    public string IncomeTypeName { get; set; }
+    public Guid AccountId { get; set; }
+    public Guid IncomeTypeId { get; set; }
 }

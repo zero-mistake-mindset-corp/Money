@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Money.BL.Interfaces;
-using Money.BL.Models.Account;
+using Money.BL.Models.MoneyAccount;
 using Money.Common.Helpers;
 using Money.Data;
 using Money.Data.Entities;
@@ -18,8 +18,9 @@ public class MoneyAccountService : IMoneyAccountService
 
     public async Task CreateAccountAsync(CreateMoneyAccountModel model, Guid userId)
     {
+
         ValidationHelper.ValidateNonNegative(model.Balance);
-        Validator.ValidateString(model.Name);
+        BaseValidator.ValidateString(model.Name);
 
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
         ValidationHelper.EnsureEntityFound(user);
@@ -50,7 +51,7 @@ public class MoneyAccountService : IMoneyAccountService
 
     public async Task UpdateAccountNameAsync(Guid accountId, Guid userId, string newAccountName)
     {
-        Validator.ValidateString(newAccountName);
+        BaseValidator.ValidateString(newAccountName);
         var account = await _context.MoneyAccounts.Where(acc => acc.Id == accountId && acc.UserId == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(account);
 

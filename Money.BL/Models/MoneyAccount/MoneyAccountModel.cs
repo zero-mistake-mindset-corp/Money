@@ -1,4 +1,4 @@
-﻿namespace Money.BL.Models.Account;
+﻿namespace Money.BL.Models.MoneyAccount;
 
 public class MoneyAccountModel
 {
