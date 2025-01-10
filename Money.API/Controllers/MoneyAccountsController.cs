@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Money.BL.Interfaces;
-using Money.BL.Models.Account;
+using Money.BL.Models.MoneyAccount;
 
 namespace Money.API.Controllers;
 

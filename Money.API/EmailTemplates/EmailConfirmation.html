@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Email Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #333333;
+        }
+
+        p {
+            color: #555555;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #999999;
+            text-align: center;
+        }
+
+        strong {
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Hello, {{UserName}}!</h2>
+        <p>Thank you for registering with our Money App.</p>
+        <p>Your confirmation code is: <strong>{{Code}}</strong></p>
+        <p>Please enter this code to complete your registration.</p>
+        <div class="footer">
+            © 2025 Money App
+        </div>
+    </div>
+</body>
+</html>

@@ -15,24 +15,31 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("sign-up")]
-    public async Task<IActionResult> SignUp(SignUpModel signUpModel)
-    {
-        await _authService.SignUpAsync(signUpModel);
-        return Created();
-    }
-
     [HttpPost("sign-in")]
     public async Task<IActionResult> SignIn(SignInModel signInModel)
     {
+        var is2FAEnabled = await _authService.IsTwoFactorAuthEnabled(signInModel.EmailOrUsername);
+        if (is2FAEnabled)
+        {
+            var notifyEmail = await _authService.Send2FACodeAsync(signInModel.EmailOrUsername, signInModel.Password);
+            return Accepted(notifyEmail);
+        }
+
         var tokensInfo = await _authService.SignInAsync(signInModel);
         return Ok(tokensInfo);
     }
 
-    [HttpPost("tokens")]
-    public async Task<IActionResult> Refresh([FromBody] string refreshToken)
+    [HttpPost("sign-in/2fa")]
+    public async Task<IActionResult> SignInWithCode(SignInWithCodeModel signInModel)
     {
-        var newTokensInfo = await _authService.RefreshTokensAsync(refreshToken);
-        return Ok(newTokensInfo);
+        var tokensInfo = await _authService.SignInWithCodeAsync(signInModel.EmailOrUsername, signInModel.Password, signInModel.Code);
+        return Ok(tokensInfo);
+    }
+
+    [HttpPost("tokens")]
+    public async Task<IActionResult> Refresh(RefreshTokensModel refreshTokensModel)
+    {
+        var refreshedTokensInfo = await _authService.RefreshTokensAsync(refreshTokensModel.RefreshToken);
+        return Ok(refreshedTokensInfo);
     }
 }
