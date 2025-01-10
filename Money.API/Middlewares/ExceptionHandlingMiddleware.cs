@@ -32,6 +32,10 @@ public class ExceptionHandlingMiddleware
         {
             await HandleExceptionAsync(context, exception, StatusCodes.Status404NotFound);
         }
+        catch (PermissionException exception)
+        {
+            await HandleExceptionAsync(context, exception, StatusCodes.Status403Forbidden);
+        }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
