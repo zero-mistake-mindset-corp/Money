@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Money.BL.Helpers;
 using Money.BL.Interfaces.Auth;
 using Money.BL.Interfaces.Infrastructure;
 using Money.BL.Models.Auth;
@@ -27,46 +28,12 @@ public class AuthService : IAuthService
 
     public async Task<TokensInfo> SignInAsync(SignInModel signInModel)
     {
-        var user = await _context.Users.Include(u => u.RefreshTokens).FirstOrDefaultAsync(u => u.Username == signInModel.Username);
+        var user = await _context.Users.Include(u => u.RefreshTokens).FirstOrDefaultAsync(u => u.Email == signInModel.Email);
         ValidationHelper.EnsureEntityFound(user);
         ValidationHelper.ValidateSignInData(user.PasswordHash, signInModel.Password);
 
         var tokens = await GenerateAndSaveTokensAsync(user);
         return tokens;
-    }
-
-    public async Task SignUpAsync(SignUpModel signUpModel)
-    {
-        ValidationHelper.ValidateSignUpData(signUpModel.Username, signUpModel.Password, signUpModel.Email);
-        EnsureUserDoesNotExist(signUpModel.Email);
-
-        var code = new ConfirmationCodeEntity
-        {
-            Value = CodeCreator.GenerateCode(),
-            IsUsed = false,
-            Expiration = DateTime.UtcNow.AddMinutes(5),
-            Metadata = ConfirmationCodeMetadata.EmailConfirmation
-        };
-
-        var userEntity = new UserEntity
-        {
-            Username = signUpModel.Username,
-            Email = signUpModel.Email,
-            IsEmailConfirmed = false,
-            IsTwoFactorAuthEnabled = true,
-            PasswordHash = InformationHasher.HashText(signUpModel.Password),
-            ConfirmationCodes = new List<ConfirmationCodeEntity> { code }
-        };
-
-        var emailModel = new EmailTemplateModel
-        {
-            UserName = signUpModel.Username,
-            Code = code.Value
-        };
-
-        _context.Users.Add(userEntity);
-        await _context.SaveChangesAsync();
-        await _emailService.SendAsync(userEntity.Email, EmailTemplateType.EmailConfirmation, emailModel);
     }
 
     public async Task<TokensInfo> RefreshTokensAsync(string refreshToken)
@@ -80,6 +47,60 @@ public class AuthService : IAuthService
         userRefreshToken.Expiration = DateTime.UtcNow;
         var tokens = await GenerateAndSaveTokensAsync(user);
         return tokens;
+    }
+
+    public async Task<string> Send2FACodeAsync(string email, string password)
+    {
+        var user = await _context.Users.Include(u => u.ConfirmationCodes).FirstOrDefaultAsync(u => u.Email == email); 
+        ValidationHelper.EnsureEntityFound(user);
+        ValidationHelper.ValidateSignInData(user.PasswordHash, password);
+        ConfirmationCodesInvalidator.InvalidatePreviousConfirmationCodes(user.ConfirmationCodes);
+
+        var code = new ConfirmationCodeEntity
+        {
+            Value = CodeCreator.GenerateCode(),
+            IsUsed = false,
+            Metadata = ConfirmationCodeMetadata.TwoFactorAuth,
+            Expiration = DateTime.UtcNow.AddMinutes(5)
+        };
+
+        var emailTemplateModel = new EmailTemplateModel
+        {
+            UserName = user.Username,
+            Code = code.Value,
+        };
+
+        user.ConfirmationCodes.Add(code);
+        await _context.SaveChangesAsync();
+        await _emailService.SendAsync(user.Email, EmailTemplateType.TwoFactorAuth, emailTemplateModel);
+        return email;
+    }
+
+    public async Task<TokensInfo> SignInWithCodeAsync(string email, string password, string code)
+    {
+        var user = await _context.Users.Include(u => u.ConfirmationCodes).Include(u => u.RefreshTokens).Where(u => u.Email == email).FirstOrDefaultAsync();
+        ValidationHelper.ValidateSignInData(user.PasswordHash, password);
+
+        var userCode = user.ConfirmationCodes.FirstOrDefault(c => c.Value == code);
+        if (userCode == null
+            || userCode.IsUsed
+            || userCode.Expiration < DateTime.UtcNow
+            || userCode.Metadata != ConfirmationCodeMetadata.TwoFactorAuth)
+        {
+            throw new InvalidInputException("Invalid confirmation code");
+        }
+
+        userCode.IsUsed = true;
+        var tokens = await GenerateAndSaveTokensAsync(user);
+        return tokens;
+    }
+
+    public async Task<bool> IsTwoFactorAuthEnabled(string email)
+    {
+        var user = await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
+        ValidationHelper.EnsureEntityFound(user);
+        var is2FAEnabled = user.IsTwoFactorAuthEnabled;
+        return is2FAEnabled;
     }
 
     public async Task<TokensInfo> GenerateAndSaveTokensAsync(UserEntity user)
@@ -106,13 +127,5 @@ public class AuthService : IAuthService
         };
 
         return tokensInfo;
-    }
-
-    private void EnsureUserDoesNotExist(string email)
-    {
-        if (_context.Users.Any(u => u.Email == email))
-        {
-            throw new EntityExistsException("User with this email already exists.");
-        }
     }
 }

@@ -14,6 +14,7 @@ public class TemplateRenderer : ITemplateRenderer
             EmailTemplateType.TwoFactorAuthToggle => "TwoFactorAuthToggle.html",
             EmailTemplateType.EmailChange => "EmailChange.html",
             EmailTemplateType.PasswordReset => "PasswordReset.html",
+            EmailTemplateType.TwoFactorAuth => "TwoFactorAuth.html",
             _ => throw new ArgumentOutOfRangeException(nameof(templateType))
         };
 

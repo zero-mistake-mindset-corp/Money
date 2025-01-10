@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="EmailTemplates\TwoFactorAuth.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="EmailTemplates\EmailChange.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

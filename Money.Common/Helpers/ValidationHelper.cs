@@ -26,6 +26,7 @@ public static class ValidationHelper
             throw new NotFoundException("Not found.");
         }
     }
+
     public static void ValidateRefreshToken(DateTime refreshTokenExpiration)
     {
         if (refreshTokenExpiration < DateTime.UtcNow)

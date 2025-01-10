@@ -31,6 +31,7 @@ public class EmailService : IEmailService
             EmailTemplateType.TwoFactorAuthToggle => "2FA confirmation",
             EmailTemplateType.EmailChange => "Email changing",
             EmailTemplateType.PasswordReset => "Password changing",
+            EmailTemplateType.TwoFactorAuth => "2FA Login Code",
             _ => "Notification"
         };
 

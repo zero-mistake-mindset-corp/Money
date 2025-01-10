@@ -1,6 +1,4 @@
-﻿using Money.Data.Entities;
-
-namespace Money.BL.Models.Account;
+﻿namespace Money.BL.Models.MoneyAccount;
 
 public class CreateMoneyAccountModel
 {

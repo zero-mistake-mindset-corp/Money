@@ -13,6 +13,7 @@ public static class BLServiceExtensions
 {
     public static IServiceCollection ConfigureBLServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
