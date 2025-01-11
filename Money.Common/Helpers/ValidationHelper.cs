@@ -48,7 +48,7 @@ public static class ValidationHelper
         }
     }
 
-    public static void ValidateNonNegative(decimal balance)
+    public static void ValidateMoneyValue(decimal balance)
     {
         if (balance < 0)
         {

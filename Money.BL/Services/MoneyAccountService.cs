@@ -19,7 +19,7 @@ public class MoneyAccountService : IMoneyAccountService
     public async Task CreateAccountAsync(CreateMoneyAccountModel model, Guid userId)
     {
 
-        ValidationHelper.ValidateNonNegative(model.Balance);
+        ValidationHelper.ValidateMoneyValue(model.Balance);
         BaseValidator.ValidateString(model.Name);
 
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
@@ -66,7 +66,7 @@ public class MoneyAccountService : IMoneyAccountService
 
     public async Task UpdateBalanceAsync(Guid accountId, Guid userId, decimal amount, bool isDeposit)
     {
-        ValidationHelper.ValidateNonNegative(amount);
+        ValidationHelper.ValidateMoneyValue(amount);
         var account = await _context.MoneyAccounts.Where(acc => acc.Id == accountId && acc.UserId == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(account);
 

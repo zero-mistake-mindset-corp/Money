@@ -13,5 +13,4 @@ public class UserEntity
     public virtual ICollection<MoneyAccountEntity> MoneyAccounts { get; set; }
     public virtual ICollection<IncomeTypeEntity> IncomeTypes { get; set; }
     public virtual ICollection<ExpenseTypeEntity> ExpenseTypes { get; set; }
-    public virtual ICollection<IncomeTransactionEntity> IncomeTransactions { get; set; }
 }

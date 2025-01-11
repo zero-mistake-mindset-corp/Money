@@ -20,7 +20,7 @@ public class IncomeTransactionService : IIncomeTransactionService
 
     public async Task CreateIncomeTransactionAsync(CreateIncomeTransactionModel model, Guid userId)
     {   
-        ValidationHelper.ValidateNonNegative(model.Amount);
+        ValidationHelper.ValidateMoneyValue(model.Amount);
 
         var user = await _context.Users.AsNoTracking()
             .Include(u => u.MoneyAccounts)
