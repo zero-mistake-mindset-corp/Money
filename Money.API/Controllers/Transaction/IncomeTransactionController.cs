@@ -20,18 +20,37 @@ public class IncomeTransactionController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> CreateIncomeTransactionAsync(CreateIncomeTransactionModel model)
+    public async Task<IActionResult> CreateIncomeTransaction(CreateIncomeTransactionModel model)
     {
         var userId = _currentUserService.GetUserId();
         await _incomeTransactionService.CreateIncomeTransactionAsync(model, userId);
         return Created();
     }
+
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAllIncomeTransactionsAsync(Guid accountId)
+    public async Task<IActionResult> GetAllIncomeTransactions(int pageNumber, int pageSize)
     {
         var userId = _currentUserService.GetUserId();
-        var incomeTransactions = await _incomeTransactionService.GetAllIncomeTransactionsAsync(userId, accountId);
+        var incomeTransactions = await _incomeTransactionService.GetAllIncomeTransactionsAsync(userId, pageNumber, pageSize);
+        return Ok(incomeTransactions);
+    }
+
+    [HttpGet("latest")]
+    [Authorize]
+    public async Task<IActionResult> GetLatestTransactions()
+    {
+        var userId = _currentUserService.GetUserId();
+        var incomeTransactions = await _incomeTransactionService.GetLatestIncomeTransactionsAsync(userId);
+        return Ok(incomeTransactions);
+    }
+
+    [HttpGet("byacc")]
+    [Authorize]
+    public async Task<IActionResult> GetIncomeTransactionsByAcc(int pageNumber, int pageSize)
+    {
+        var userId = _currentUserService.GetUserId();
+        var incomeTransactions = await _incomeTransactionService.GetIncomeTransactionsByAccAsync(userId, pageNumber, pageSize);
         return Ok(incomeTransactions);
     }
 }

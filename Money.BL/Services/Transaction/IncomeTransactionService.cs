@@ -43,7 +43,7 @@ public class IncomeTransactionService : IIncomeTransactionService
             Amount = model.Amount,
             AccountId = account.Id,
             IncomeTypeId = incomeType.Id,
-            Name = model.Name
+            Name = model.Name,
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -61,10 +61,50 @@ public class IncomeTransactionService : IIncomeTransactionService
         }
     }
 
-    public async Task<List<IncomeTransactionModel>> GetAllIncomeTransactionsAsync(Guid accountId, Guid userId)
+    public async Task<List<IncomeTransactionModel>> GetAllIncomeTransactionsAsync(Guid userId, int pageNumber, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.Id == accountId && it.MoneyAccount.UserId == userId)
+            .Where(it => it.MoneyAccount.UserId == userId)
+            .OrderByDescending(it => it.TransactionDate)
+            .Skip((pageNumber-1) * pageSize)
+            .Take(pageSize)
+            .Select(it => new IncomeTransactionModel
+            {
+                Id = it.Id,
+                TransactionDate = it.TransactionDate,
+                Amount = it.Amount,
+                AccountId = it.AccountId,
+                IncomeTypeId = it.IncomeTypeId,
+                Name = it.Name
+            }).ToListAsync();
+        return incomeTransactions;
+    }
+
+        public  async Task<List<IncomeTransactionModel>> GetLatestIncomeTransactionsAsync(Guid userId)
+    {
+        var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
+            .Where(it => it.MoneyAccount.UserId == userId)
+            .OrderByDescending(it => it.TransactionDate)
+            .Take(10)
+            .Select(it => new IncomeTransactionModel
+            {
+                Id = it.Id,
+                TransactionDate = it.TransactionDate,
+                Amount = it.Amount,
+                AccountId = it.AccountId,
+                IncomeTypeId = it.IncomeTypeId,
+                Name = it.Name
+            }).ToListAsync();
+        return incomeTransactions;
+    }
+
+    public async Task<List<IncomeTransactionModel>> GetIncomeTransactionByAccAsync(Guid userId, int pageNumber, int pageSize)
+    {
+        var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
+            .Where(it => it.MoneyAccount.UserId == userId)
+            .OrderByDescending(it => it.TransactionDate)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .Select(it => new IncomeTransactionModel
             {
                 Id = it.Id,
