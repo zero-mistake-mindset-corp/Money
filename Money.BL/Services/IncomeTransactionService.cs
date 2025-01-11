@@ -21,6 +21,7 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task CreateIncomeTransactionAsync(CreateIncomeTransactionModel model, Guid userId)
     {   
         ValidationHelper.ValidateMoneyValue(model.Amount);
+        BaseValidator.ValidateString(model.Name, maxLength: 100);
 
         var user = await _context.Users.AsNoTracking()
             .Include(u => u.MoneyAccounts)
@@ -41,7 +42,8 @@ public class IncomeTransactionService : IIncomeTransactionService
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
             AccountId = account.Id,
-            IncomeTypeId = incomeType.Id
+            IncomeTypeId = incomeType.Id,
+            Name = model.Name
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -69,7 +71,8 @@ public class IncomeTransactionService : IIncomeTransactionService
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
                 AccountId = it.AccountId,
-                IncomeTypeId = it.IncomeTypeId
+                IncomeTypeId = it.IncomeTypeId,
+                Name = it.Name
             }).ToListAsync();
         return incomeTransactions;
     }
