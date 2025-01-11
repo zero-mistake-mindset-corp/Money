@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Money.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class IncomeTransaction : Migration
+    public partial class IncomeTransactions : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,8 +19,7 @@ namespace Money.Data.Migrations
                     Name = table.Column<string>(type: "text", nullable: true),
                     TransactionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uuid", nullable: false),
-                    MoneyAccountId = table.Column<Guid>(type: "uuid", nullable: true),
+                    MoneyAccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     IncomeTypeId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -36,7 +35,8 @@ namespace Money.Data.Migrations
                         name: "FK_IncomeTransactions_MoneyAccounts_MoneyAccountId",
                         column: x => x.MoneyAccountId,
                         principalTable: "MoneyAccounts",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

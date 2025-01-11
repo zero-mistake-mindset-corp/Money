@@ -75,16 +75,13 @@ namespace Money.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
                     b.Property<Guid>("IncomeTypeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("MoneyAccountId")
+                    b.Property<Guid>("MoneyAccountId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -223,7 +220,9 @@ namespace Money.Data.Migrations
 
                     b.HasOne("Money.Data.Entities.MoneyAccountEntity", "MoneyAccount")
                         .WithMany("IncomeTransactions")
-                        .HasForeignKey("MoneyAccountId");
+                        .HasForeignKey("MoneyAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("IncomeType");
 

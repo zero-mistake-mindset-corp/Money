@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Money.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250111222327_IncomeTransaction")]
-    partial class IncomeTransaction
+    [Migration("20250111225654_IncomeTransactions")]
+    partial class IncomeTransactions
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,16 +78,13 @@ namespace Money.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AccountId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
                     b.Property<Guid>("IncomeTypeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("MoneyAccountId")
+                    b.Property<Guid>("MoneyAccountId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -226,7 +223,9 @@ namespace Money.Data.Migrations
 
                     b.HasOne("Money.Data.Entities.MoneyAccountEntity", "MoneyAccount")
                         .WithMany("IncomeTransactions")
-                        .HasForeignKey("MoneyAccountId");
+                        .HasForeignKey("MoneyAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("IncomeType");
 

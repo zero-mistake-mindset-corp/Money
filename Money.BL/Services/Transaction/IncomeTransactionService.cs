@@ -35,14 +35,14 @@ public class IncomeTransactionService : IIncomeTransactionService
         var moneyAccount = user.MoneyAccounts.FirstOrDefault(acc => acc.Id == model.MoneyAccountId);
         ValidationHelper.EnsureEntityFound(moneyAccount);
 
-        var incomeType = user.IncomeTypes.FirstOrDefault(it => it.Id == model.MoneyAccountId);
+        var incomeType = user.IncomeTypes.FirstOrDefault(it => it.Id == model.IncomeTypeId);
         ValidationHelper.EnsureEntityFound(incomeType);
 
         var newIncomeTransaction = new IncomeTransactionEntity
         {
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
-            AccountId = moneyAccount.Id,
+            MoneyAccountId = moneyAccount.Id,
             IncomeTypeId = incomeType.Id,
             Name = model.Name,
         };
@@ -52,6 +52,7 @@ public class IncomeTransactionService : IIncomeTransactionService
         {
             await _moneyAccountService.UpdateBalanceAsync(moneyAccount.Id, userId, model.Amount, true);
             _context.IncomeTransactions.Add(newIncomeTransaction);
+            await _context.SaveChangesAsync();
             await transaction.CommitAsync();
         }
         catch (Exception ex)
@@ -75,7 +76,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Name = it.Name,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.AccountId,
+                AccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId
             }).ToListAsync();
 
@@ -93,7 +94,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Id = it.Id,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.AccountId,
+                AccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
                 Name = it.Name
             }).ToListAsync();
@@ -113,7 +114,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Id = it.Id,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.AccountId,
+                AccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
                 Name = it.Name
             }).ToListAsync();
