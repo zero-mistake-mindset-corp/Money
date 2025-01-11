@@ -98,7 +98,7 @@ public class IncomeTransactionService : IIncomeTransactionService
         return incomeTransactions;
     }
 
-    public async Task<List<IncomeTransactionModel>> GetIncomeTransactionByAccAsync(Guid userId, int pageNumber, int pageSize)
+    public async Task<List<IncomeTransactionModel>> GetIncomeTransactionsByAccAsync(Guid userId, int pageNumber, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
             .Where(it => it.MoneyAccount.UserId == userId)
