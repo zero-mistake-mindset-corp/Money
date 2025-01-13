@@ -102,10 +102,10 @@ public class IncomeTransactionService : IIncomeTransactionService
         return incomeTransactions;
     }
 
-    public async Task<List<IncomeTransactionModel>> GetIncomeTransactionsByAccAsync(Guid userId, int pageIndex, int pageSize)
+    public async Task<List<IncomeTransactionModel>> GetIncomeTransactionsByAccAsync(Guid userId, Guid accountId, int pageIndex, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId)
+            .Where(it => it.MoneyAccount.UserId == userId && it.MoneyAccountId == accountId)
             .OrderByDescending(it => it.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)

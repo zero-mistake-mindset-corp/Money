@@ -50,7 +50,7 @@ public class IncomeTypesController : ControllerBase
     public async Task<IActionResult> DeleteIncomeType(Guid incomeTypeId)
     {
         var userId = _currentUserService.GetUserId();
-        await _incomeTypeService.DeleteIncomeTypeAsync(incomeTypeId, userId);
+        await _incomeTypeService.DeleteIncomeTypeAsync(userId, incomeTypeId);
         return Ok();
     }
 }
