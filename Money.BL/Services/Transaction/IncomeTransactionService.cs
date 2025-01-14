@@ -5,6 +5,7 @@ using Money.Common.Helpers;
 using Money.Data.Entities;
 using Money.Data;
 using Microsoft.Extensions.Logging;
+using Money.Common.Exceptions;
 
 namespace Money.BL.Services;
 
@@ -26,31 +27,34 @@ public class IncomeTransactionService : IIncomeTransactionService
         ValidationHelper.ValidateMoneyValue(model.Amount);
         BaseValidator.ValidateString(model.Name, maxLength: 100);
 
-        var user = await _context.Users.AsNoTracking()
-            .Include(u => u.MoneyAccounts)
-            .Include(u => u.IncomeTypes)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        var user = await _context.Users.AsNoTracking().Where(u => u.Id == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
 
-        var moneyAccount = user.MoneyAccounts.FirstOrDefault(acc => acc.Id == model.MoneyAccountId);
-        ValidationHelper.EnsureEntityFound(moneyAccount);
+        var isMoneyAccountExist = await _context.MoneyAccounts.AnyAsync(ma => ma.UserId == user.Id && ma.Id == model.MoneyAccountId);
+        if (isMoneyAccountExist == false)
+        {
+            throw new NotFoundException("Money account with this ID does not exist.");
+        }
 
-        var incomeType = user.IncomeTypes.FirstOrDefault(it => it.Id == model.IncomeTypeId);
-        ValidationHelper.EnsureEntityFound(incomeType);
+        var isIncomeTypeExist = await _context.IncomeTypes.AnyAsync(it => it.UserId == userId && it.Id == model.IncomeTypeId);
+        if (isIncomeTypeExist == false)
+        {
+            throw new NotFoundException("Income type with this ID does not exist.");
+        }
 
         var newIncomeTransaction = new IncomeTransactionEntity
         {
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
-            MoneyAccountId = moneyAccount.Id,
-            IncomeTypeId = incomeType.Id,
+            MoneyAccountId = model.MoneyAccountId,
+            IncomeTypeId = model.IncomeTypeId,
             Name = model.Name,
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            await _moneyAccountService.UpdateBalanceAsync(moneyAccount.Id, userId, model.Amount, true);
+            await _moneyAccountService.UpdateBalanceAsync(model.MoneyAccountId, userId, model.Amount, true);
             _context.IncomeTransactions.Add(newIncomeTransaction);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -83,7 +87,7 @@ public class IncomeTransactionService : IIncomeTransactionService
         return incomeTransactions;
     }
 
-    public async Task<List<IncomeTransactionModel>> GetLatestIncomeTransactionsAsync(Guid userId)
+    public async Task<List<IncomeTransactionModel>> Get10LastIncomeTransactionsAsync(Guid userId)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
             .Where(it => it.MoneyAccount.UserId == userId)
@@ -102,10 +106,10 @@ public class IncomeTransactionService : IIncomeTransactionService
         return incomeTransactions;
     }
 
-    public async Task<List<IncomeTransactionModel>> GetIncomeTransactionsByAccAsync(Guid userId, int pageIndex, int pageSize)
+    public async Task<List<IncomeTransactionModel>> GetIncomeTransactionsByAccAsync(Guid userId, Guid moneyAccountId, int pageIndex, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId)
+            .Where(it => it.MoneyAccount.UserId == userId && it.MoneyAccount.Id == moneyAccountId)
             .OrderByDescending(it => it.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
