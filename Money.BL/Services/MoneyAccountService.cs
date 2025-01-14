@@ -18,8 +18,7 @@ public class MoneyAccountService : IMoneyAccountService
 
     public async Task CreateAccountAsync(CreateMoneyAccountModel model, Guid userId)
     {
-
-        ValidationHelper.ValidateMoneyValue(model.Balance);
+        ValidationHelper.ValidateBalance(model.Balance);
         BaseValidator.ValidateString(model.Name);
 
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);

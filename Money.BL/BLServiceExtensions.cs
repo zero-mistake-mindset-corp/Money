@@ -20,10 +20,9 @@ public static class BLServiceExtensions
         services.AddScoped<IMoneyAccountService, MoneyAccountService>();
         services.AddScoped<IIncomeTypeService, IncomeTypeService>();
         services.AddScoped<IExpenseTypeService, ExpenseTypeService>();
-        services.AddScoped<IIncomeTransactionService, IncomeTransactionService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IIncomeTransactionService, IncomeTransactionService>();
         services.AddScoped<ITemplateRenderer, TemplateRenderer>();
-
         return services;
     }
 }
