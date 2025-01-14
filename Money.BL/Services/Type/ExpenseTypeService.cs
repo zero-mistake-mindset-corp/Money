@@ -21,12 +21,13 @@ public class ExpenseTypeService : IExpenseTypeService
         BaseValidator.ValidateString(model.Name);
         var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
         ValidationHelper.EnsureEntityFound(user);
+
         var newExpenseType = new ExpenseTypeEntity
         {
             Name = model.Name,
             UserId = userId
         };
-
+       
         await _context.ExpenseTypes.AddAsync(newExpenseType);
         await _context.SaveChangesAsync();
     }

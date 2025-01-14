@@ -7,4 +7,5 @@ public class MoneyAccountEntity
     public decimal Balance { get; set; }
     public Guid UserId { get; set; }
     public virtual UserEntity User { get; set; }
+    public virtual ICollection<IncomeTransactionEntity> IncomeTransactions { get; set; }
 }

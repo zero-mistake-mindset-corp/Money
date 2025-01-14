@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Money.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Money.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250111225654_IncomeTransactions")]
+    partial class IncomeTransactions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,7 +81,7 @@ namespace Money.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid?>("IncomeTypeId")
+                    b.Property<Guid>("IncomeTypeId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("MoneyAccountId")
@@ -215,7 +218,8 @@ namespace Money.Data.Migrations
                     b.HasOne("Money.Data.Entities.IncomeTypeEntity", "IncomeType")
                         .WithMany("IncomeTransactions")
                         .HasForeignKey("IncomeTypeId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Money.Data.Entities.MoneyAccountEntity", "MoneyAccount")
                         .WithMany("IncomeTransactions")
