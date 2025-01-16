@@ -34,7 +34,7 @@ public class AuthService : IAuthService
 
         if (user.IsEmailConfirmed == false)
         {
-            throw new PermissionException("You must confirm your email to use app.");
+            throw new PermissionException("You must confirm your email to authenticate.");
         }
 
         var tokens = await GenerateAndSaveTokensAsync(user);
@@ -61,7 +61,7 @@ public class AuthService : IAuthService
         ValidationHelper.ValidateSignInData(user.PasswordHash, password);
         if (user.IsEmailConfirmed == false)
         {
-            throw new PermissionException("You must confirm your email to use app.");
+            throw new PermissionException("You must confirm your email to authenticate.");
         }
 
         ConfirmationCodesInvalidator.InvalidatePreviousConfirmationCodes(user.ConfirmationCodes);

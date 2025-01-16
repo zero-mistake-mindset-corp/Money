@@ -61,6 +61,10 @@ public class UserService : IUserService
     {
         var user = await _context.Users.Include(u => u.ConfirmationCodes).Where(u => u.Email == email).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
+        if (user.IsEmailConfirmed)
+        {
+            throw new PermissionException("You have already confirmed your email address");
+        }
 
         var userCode = user.ConfirmationCodes.FirstOrDefault(c => c.Value == code);
         if (userCode == null
@@ -80,6 +84,10 @@ public class UserService : IUserService
     {
         var user = await _context.Users.Include(u => u.ConfirmationCodes).Where(u => u.Email == email).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
+        if (user.IsEmailConfirmed)
+        {
+            throw new PermissionException("You have already confirmed your email address");
+        }
 
         ConfirmationCodesInvalidator.InvalidatePreviousConfirmationCodes(user.ConfirmationCodes);
 
