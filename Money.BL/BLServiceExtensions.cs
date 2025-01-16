@@ -31,6 +31,7 @@ public static class BLServiceExtensions
         services.AddScoped<ITemplateRenderer, TemplateRenderer>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<IUserExistenceService, UserExistenceService>();
+        services.AddScoped<IGoogleAuthService, GoogleAuthService>();
         return services;
     }
 }

@@ -30,13 +30,9 @@ public static class ApplicationServiceExtensions
             loggingBuilder.AddSerilog();
         });
 
-        services.Configure<JwtOptions>(
-            configuration.GetSection(
-                key: nameof(JwtOptions)));
-
-        services.Configure<EmailOptions>(
-            configuration.GetSection(
-                key: nameof(EmailOptions)));
+        services.Configure<JwtOptions>(configuration.GetSection(key: nameof(JwtOptions)));
+        services.Configure<EmailOptions>(configuration.GetSection(key: nameof(EmailOptions)));
+        services.Configure<GoogleOptions>(configuration.GetSection(key: nameof(GoogleOptions)));
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
