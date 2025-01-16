@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Money.BL.Helpers;
-using Money.BL.Interfaces;
 using Money.BL.Interfaces.Infrastructure;
+using Money.BL.Interfaces.User;
 using Money.BL.Models.Auth;
 using Money.BL.Models.Email;
 using Money.Common;
@@ -10,7 +10,7 @@ using Money.Common.Helpers;
 using Money.Data;
 using Money.Data.Entities;
 
-namespace Money.BL.Services;
+namespace Money.BL.Services.User;
 
 public class UserService : IUserService
 {

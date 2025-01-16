@@ -1,6 +1,6 @@
 using Money.BL.Models.Transaction;
 
-namespace Money.BL.Interfaces;
+namespace Money.BL.Interfaces.Transactions;
 
 public interface IIncomeTransactionService
 {

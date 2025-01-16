@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Money.BL.Interfaces;
+using Money.BL.Interfaces.User;
 using Money.BL.Models.Auth;
 using Money.BL.Models.UserAccount;
 

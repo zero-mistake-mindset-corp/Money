@@ -3,9 +3,9 @@ using Money.Data;
 using Money.Common.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Money.Data.Entities;
-using Money.BL.Interfaces;
+using Money.BL.Interfaces.TransactionTypes;
 
-namespace Money.BL.Services;
+namespace Money.BL.Services.TransactionTypes;
 
 public class IncomeTypeService : IIncomeTypeService
 {

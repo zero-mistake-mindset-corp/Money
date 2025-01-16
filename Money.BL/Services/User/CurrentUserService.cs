@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Money.BL.Interfaces;
+using Money.BL.Interfaces.User;
 using Money.Common;
 
-namespace Money.BL.Services;
+namespace Money.BL.Services.User;
 
 public class CurrentUserService : ICurrentUserService
 {
