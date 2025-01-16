@@ -16,17 +16,19 @@ public class UserService : IUserService
 {
     private readonly AppDbContext _context;
     private readonly IEmailService _emailService;
+    private readonly IUserExistenceService _userExistenceService;
 
-    public UserService(AppDbContext context, IEmailService emailService)
+    public UserService(AppDbContext context, IEmailService emailService, IUserExistenceService userExistenceService)
     {
         _context = context;
         _emailService = emailService;
+        _userExistenceService = userExistenceService;
     }
 
     public async Task SignUpAsync(SignUpModel signUpModel)
     {
         ValidationHelper.ValidateSignUpData(signUpModel.Username, signUpModel.Password, signUpModel.Email);
-        EnsureUserDoesNotExist(signUpModel.Email, signUpModel.Username);
+        await _userExistenceService.EnsureUserDoesNotExist(signUpModel.Email, signUpModel.Username);
 
         var code = new ConfirmationCodeEntity
         {
@@ -108,13 +110,5 @@ public class UserService : IUserService
         user.ConfirmationCodes.Add(code);
         await _context.SaveChangesAsync();
         await _emailService.SendAsync(user.Email, EmailTemplateType.EmailConfirmation, emailModel);
-    }
-
-    private void EnsureUserDoesNotExist(string email, string username)
-    {
-        if (_context.Users.Any(u => u.Email == email || u.Username == username || u.Email == username || u.Username == email))
-        {
-            throw new EntityExistsException("User with this username or email already exists.");
-        }
     }
 }

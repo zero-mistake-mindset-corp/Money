@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Money.BL.Interfaces.Auth;
 using Money.BL.Models.Auth;
 
-namespace Money.API.Controllers;
+namespace Money.API.Controllers.User;
 
 [ApiController]
 [Route("[controller]")]
