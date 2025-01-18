@@ -28,6 +28,7 @@ public static class BLServiceExtensions
         services.AddScoped<IExpenseTypeService, ExpenseTypeService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IIncomeTransactionService, IncomeTransactionService>();
+        services.AddScoped<IExpenseTransactionService, ExpenseTransactionService>();
         services.AddScoped<ITemplateRenderer, TemplateRenderer>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<IUserExistenceService, UserExistenceService>();
