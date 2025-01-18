@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Money.BL.Interfaces;
+using Money.BL.Interfaces.User;
 using Money.BL.Models.Auth;
 using Money.BL.Models.UserAccount;
 
-namespace Money.API.Controllers;
+namespace Money.API.Controllers.User;
 
 [Route("[controller]")]
 [ApiController]
-public class AccountController : ControllerBase
+public class UserAccountController : ControllerBase
 {
     private readonly IUserService _userSerivce;
 
-    public AccountController(IUserService userSerivce)
+    public UserAccountController(IUserService userSerivce)
     {
         _userSerivce = userSerivce;
     }

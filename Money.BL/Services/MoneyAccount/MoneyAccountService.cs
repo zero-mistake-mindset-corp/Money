@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Money.BL.Interfaces;
+using Money.BL.Interfaces.MoneyAccount;
 using Money.BL.Models.MoneyAccount;
 using Money.Common.Helpers;
 using Money.Data;
 using Money.Data.Entities;
 
-namespace Money.BL.Services;
+namespace Money.BL.Services.MoneyAccount;
 
 public class MoneyAccountService : IMoneyAccountService
 {
@@ -38,8 +38,8 @@ public class MoneyAccountService : IMoneyAccountService
     public async Task<List<MoneyAccountModel>> GetAllAccountsAsync(Guid userId)
     {
         var accounts = await _context.MoneyAccounts.AsNoTracking().Where(acc => acc.UserId == userId)
-            .Select(acc => new MoneyAccountModel 
-            { 
+            .Select(acc => new MoneyAccountModel
+            {
                 Id = acc.Id,
                 Name = acc.Name,
                 Balance = acc.Balance,

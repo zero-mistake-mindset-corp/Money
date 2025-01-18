@@ -1,13 +1,14 @@
 using Money.BL.Models.Transaction;
-using Money.BL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Money.Common.Helpers;
 using Money.Data.Entities;
 using Money.Data;
 using Microsoft.Extensions.Logging;
 using Money.Common.Exceptions;
+using Money.BL.Interfaces.Transactions;
+using Money.BL.Interfaces.MoneyAccount;
 
-namespace Money.BL.Services;
+namespace Money.BL.Services.Transactions;
 
 public class IncomeTransactionService : IIncomeTransactionService
 {

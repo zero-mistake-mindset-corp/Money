@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Money.BL.Interfaces;
+using Money.BL.Interfaces.TransactionTypes;
+using Money.BL.Interfaces.User;
 using Money.BL.Models.Type;
 
-namespace Money.API.Controllers;
+namespace Money.API.Controllers.TransactionTypes;
 
 [Route("[controller]")]
 [ApiController]

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Money.BL.Helpers;
-using Money.BL.Interfaces;
 using Money.BL.Interfaces.Infrastructure;
+using Money.BL.Interfaces.User;
 using Money.BL.Models.Auth;
 using Money.BL.Models.Email;
 using Money.Common;
@@ -10,23 +10,25 @@ using Money.Common.Helpers;
 using Money.Data;
 using Money.Data.Entities;
 
-namespace Money.BL.Services;
+namespace Money.BL.Services.User;
 
 public class UserService : IUserService
 {
     private readonly AppDbContext _context;
     private readonly IEmailService _emailService;
+    private readonly IUserExistenceService _userExistenceService;
 
-    public UserService(AppDbContext context, IEmailService emailService)
+    public UserService(AppDbContext context, IEmailService emailService, IUserExistenceService userExistenceService)
     {
         _context = context;
         _emailService = emailService;
+        _userExistenceService = userExistenceService;
     }
 
     public async Task SignUpAsync(SignUpModel signUpModel)
     {
         ValidationHelper.ValidateSignUpData(signUpModel.Username, signUpModel.Password, signUpModel.Email);
-        EnsureUserDoesNotExist(signUpModel.Email, signUpModel.Username);
+        await _userExistenceService.EnsureUserDoesNotExist(signUpModel.Email, signUpModel.Username);
 
         var code = new ConfirmationCodeEntity
         {
@@ -61,6 +63,10 @@ public class UserService : IUserService
     {
         var user = await _context.Users.Include(u => u.ConfirmationCodes).Where(u => u.Email == email).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
+        if (user.IsEmailConfirmed)
+        {
+            throw new PermissionException("You have already confirmed your email address");
+        }
 
         var userCode = user.ConfirmationCodes.FirstOrDefault(c => c.Value == code);
         if (userCode == null
@@ -80,6 +86,10 @@ public class UserService : IUserService
     {
         var user = await _context.Users.Include(u => u.ConfirmationCodes).Where(u => u.Email == email).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
+        if (user.IsEmailConfirmed)
+        {
+            throw new PermissionException("You have already confirmed your email address");
+        }
 
         ConfirmationCodesInvalidator.InvalidatePreviousConfirmationCodes(user.ConfirmationCodes);
 
@@ -100,13 +110,5 @@ public class UserService : IUserService
         user.ConfirmationCodes.Add(code);
         await _context.SaveChangesAsync();
         await _emailService.SendAsync(user.Email, EmailTemplateType.EmailConfirmation, emailModel);
-    }
-
-    private void EnsureUserDoesNotExist(string email, string username)
-    {
-        if (_context.Users.Any(u => u.Email == email || u.Username == username || u.Email == username || u.Username == email))
-        {
-            throw new EntityExistsException("User with this username or email already exists.");
-        }
     }
 }

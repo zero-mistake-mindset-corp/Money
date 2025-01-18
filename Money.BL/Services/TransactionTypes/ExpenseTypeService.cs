@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using Money.BL.Interfaces;
+using Money.BL.Interfaces.TransactionTypes;
 using Money.BL.Models.Type;
 using Money.Common.Helpers;
 using Money.Data;
 using Money.Data.Entities;
 
-namespace Money.BL.Services;
+namespace Money.BL.Services.TransactionTypes;
 
 public class ExpenseTypeService : IExpenseTypeService
 {

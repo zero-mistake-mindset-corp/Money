@@ -2,17 +2,19 @@ using Microsoft.AspNetCore.Mvc;
 using Money.BL.Interfaces.Auth;
 using Money.BL.Models.Auth;
 
-namespace Money.API.Controllers;
+namespace Money.API.Controllers.User;
 
 [ApiController]
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IGoogleAuthService _googleAuthService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IGoogleAuthService googleAuthService)
     {
         _authService = authService;
+        _googleAuthService = googleAuthService;
     }
 
     [HttpPost("sign-in")]
@@ -41,5 +43,12 @@ public class AuthController : ControllerBase
     {
         var refreshedTokensInfo = await _authService.RefreshTokensAsync(refreshTokensModel.RefreshToken);
         return Ok(refreshedTokensInfo);
+    }
+
+    [HttpPost("sign-in/google")]
+    public async Task<IActionResult> SignInWithGoogle(GoogleSignInModel googleSignInModel)
+    {
+        var tokensInfo = await _googleAuthService.GoogleSignIn(googleSignInModel);
+        return Ok(tokensInfo);
     }
 }

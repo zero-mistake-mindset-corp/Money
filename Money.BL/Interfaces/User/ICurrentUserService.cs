@@ -1,4 +1,4 @@
-﻿namespace Money.BL.Interfaces;
+﻿namespace Money.BL.Interfaces.User;
 
 public interface ICurrentUserService
 {

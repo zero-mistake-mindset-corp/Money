@@ -1,6 +1,6 @@
 ﻿using Money.BL.Models.MoneyAccount;
 
-namespace Money.BL.Interfaces;
+namespace Money.BL.Interfaces.MoneyAccount;
 
 public interface IMoneyAccountService
 {
