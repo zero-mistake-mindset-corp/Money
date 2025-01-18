@@ -18,6 +18,12 @@ public class AppDbContext : DbContext
             .WithMany(itype => itype.IncomeTransactions)
             .HasForeignKey(it => it.IncomeTypeId)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        modelBuilder.Entity<ExpenseTransactionEntity>()
+            .HasOne(et => et.ExpenseType)
+            .WithMany(etype => etype.ExpenseTransactions)
+            .HasForeignKey(et => et.ExpenseTypeId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 
     public DbSet<UserEntity> Users { get; set; }
@@ -27,4 +33,5 @@ public class AppDbContext : DbContext
     public DbSet<IncomeTypeEntity> IncomeTypes { get; set; }
     public DbSet<ExpenseTypeEntity> ExpenseTypes { get; set; }
     public DbSet<IncomeTransactionEntity> IncomeTransactions { get; set; }
+    public DbSet<ExpenseTransactionEntity> ExpenseTransactions { get; set; }
 }

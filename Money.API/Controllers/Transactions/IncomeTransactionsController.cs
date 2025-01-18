@@ -46,12 +46,12 @@ public class IncomeTransactionsController : ControllerBase
         return Ok(incomeTransactions);
     }
 
-    [HttpGet("{accountId}")]
+    [HttpGet("{moneyAccountId}")]
     [Authorize]
-    public async Task<IActionResult> GetIncomeTransactionsByAcc(Guid accountId, int pageIndex = 1, int pageSize = 10)
+    public async Task<IActionResult> GetIncomeTransactionsByAcc(Guid moneyAccountId, int pageIndex = 1, int pageSize = 10)
     {
         var userId = _currentUserService.GetUserId();
-        var incomeTransactions = await _incomeTransactionService.GetIncomeTransactionsByAccAsync(userId, accountId, pageIndex, pageSize);
+        var incomeTransactions = await _incomeTransactionService.GetIncomeTransactionsByAccAsync(userId, moneyAccountId, pageIndex, pageSize);
         return Ok(incomeTransactions);
     }
 }

@@ -81,7 +81,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Name = it.Name,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.MoneyAccountId,
+                MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId
             }).ToListAsync();
 
@@ -99,7 +99,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Id = it.Id,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.MoneyAccountId,
+                MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
                 Name = it.Name
             }).ToListAsync();
@@ -119,7 +119,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Id = it.Id,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.MoneyAccountId,
+                MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
                 Name = it.Name
             }).ToListAsync();
