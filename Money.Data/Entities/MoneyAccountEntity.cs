@@ -8,4 +8,7 @@ public class MoneyAccountEntity
     public Guid UserId { get; set; }
     public virtual UserEntity User { get; set; }
     public virtual ICollection<IncomeTransactionEntity> IncomeTransactions { get; set; }
+    public virtual ICollection<ExpenseTransactionEntity> ExpenseTransactions { get; set; }
+    public virtual ICollection<TransferEntity> SentTransfers { get; set; }
+    public virtual ICollection<TransferEntity> RecievedTransfers { get; set; }
 }
