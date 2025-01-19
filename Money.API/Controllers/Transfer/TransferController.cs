@@ -55,5 +55,4 @@ public class TransferController : ControllerBase
         await _transferService.DeleteTransferAsync(userId, transferId);
         return Ok();
     }
-
 }
