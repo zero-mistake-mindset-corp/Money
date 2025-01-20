@@ -10,5 +10,5 @@ public class MoneyAccountEntity
     public virtual ICollection<IncomeTransactionEntity> IncomeTransactions { get; set; }
     public virtual ICollection<ExpenseTransactionEntity> ExpenseTransactions { get; set; }
     public virtual ICollection<TransferEntity> SentTransfers { get; set; }
-    public virtual ICollection<TransferEntity> RecievedTransfers { get; set; }
+    public virtual ICollection<TransferEntity> ReceivedTransfers { get; set; }
 }

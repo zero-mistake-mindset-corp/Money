@@ -1,20 +1,19 @@
-using Google.Apis.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Money.BL.Interfaces.Transfer;
+using Money.BL.Interfaces.Transfers;
 using Money.BL.Interfaces.User;
 using Money.BL.Models.Transfer;
 
-namespace Money.API.Controllers.Transfer;
+namespace Money.API.Controllers.Transfers;
 
 [ApiController]
 [Route("[controller]")]
-public class TransferController : ControllerBase
+public class TransfersController : ControllerBase
 {
     private readonly ICurrentUserService _currentUserService;
     private readonly ITransferService _transferService;
 
-    public TransferController(ICurrentUserService currentUserService, ITransferService transferService)
+    public TransfersController(ICurrentUserService currentUserService, ITransferService transferService)
     {
         _currentUserService = currentUserService;
         _transferService = transferService;
@@ -31,7 +30,7 @@ public class TransferController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public async Task<IActionResult> GetAllTransfers(int pageIndex, int pageSize)
+    public async Task<IActionResult> GetAllTransfers(int pageIndex = 1, int pageSize = 10)
     {
         var userId = _currentUserService.GetUserId();
         var transfers = await _transferService.GetAllTransfersAsync(userId, pageIndex, pageSize);

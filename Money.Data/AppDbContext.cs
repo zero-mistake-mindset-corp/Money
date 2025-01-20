@@ -32,9 +32,9 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<TransferEntity>()
-            .HasOne(t => t.RecievingMoneyAccount)
-            .WithMany(ma => ma.RecievedTransfers)
-            .HasForeignKey(t => t.RecievingMoneyAccountId)
+            .HasOne(t => t.ReceivingMoneyAccount)
+            .WithMany(ma => ma.ReceivedTransfers)
+            .HasForeignKey(t => t.ReceivingMoneyAccountId)
             .OnDelete(DeleteBehavior.SetNull);
     }
 

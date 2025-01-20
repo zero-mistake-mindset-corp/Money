@@ -5,14 +5,14 @@ using Money.BL.Interfaces.Infrastructure;
 using Money.BL.Interfaces.MoneyAccount;
 using Money.BL.Interfaces.Transactions;
 using Money.BL.Interfaces.TransactionTypes;
-using Money.BL.Interfaces.Transfer;
+using Money.BL.Interfaces.Transfers;
 using Money.BL.Interfaces.User;
 using Money.BL.Services.Auth;
 using Money.BL.Services.Infrastructure;
 using Money.BL.Services.MoneyAccount;
 using Money.BL.Services.Transactions;
 using Money.BL.Services.TransactionTypes;
-using Money.BL.Services.Transfer;
+using Money.BL.Services.Transfers;
 using Money.BL.Services.User;
 
 namespace Money.BL;

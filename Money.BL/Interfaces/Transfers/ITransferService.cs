@@ -1,7 +1,7 @@
 using Money.BL.Models.Transfer;
 
+namespace Money.BL.Interfaces.Transfers;
 
-namespace Money.BL.Interfaces.Transfer;
 public interface ITransferService
 {
     Task CreateTransferAsync(CreateTransferModel model, Guid userId);
