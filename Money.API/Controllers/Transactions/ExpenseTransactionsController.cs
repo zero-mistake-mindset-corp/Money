@@ -54,4 +54,13 @@ public class ExpenseTransactionsController : ControllerBase
         var expenseTransactions = await _expenseTransactionService.GetExpenseTransactionsByAccAsync(userId, moneyAccountId, pageIndex, pageSize);
         return Ok(expenseTransactions);
     }
+
+    [HttpPut]
+    [Authorize]
+    public async Task<IActionResult> UpdateExpenseTransactionComment(Guid expenseTransactionId, string newComment)
+    {
+        var userId = _currentUserService.GetUserId();
+        await _expenseTransactionService.UpdateExpenseTransactionCommentAsync(userId, expenseTransactionId, newComment);
+        return Ok();
+    }
 }
