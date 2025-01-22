@@ -28,6 +28,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
         ValidationHelper.ValidateMoneyValue(model.Amount);
         BaseValidator.ValidateString(model.Name, maxLength: 100);
         BaseValidator.ValidateString(model.Comment, maxLength: 250);
+        BaseValidator.ValidateDate(model.TransactionDate);
 
         var user = await _context.Users.AsNoTracking().Where(u => u.Id == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
