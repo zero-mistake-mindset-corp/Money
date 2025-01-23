@@ -40,7 +40,7 @@ public class IncomeTransactionService : IIncomeTransactionService
             throw new NotFoundException("Money account with this ID does not exist.");
         }
 
-        var isIncomeTypeExist = await _context.IncomeTypes.AnyAsync(it => it.UserId == userId && it.Id == model.IncomeTypeId);
+        var isIncomeTypeExist = await _context.IncomeTypes.AnyAsync(itype => itype.UserId == userId && itype.Id == model.IncomeTypeId);
         if (isIncomeTypeExist == false)
         {
             throw new NotFoundException("Income type with this ID does not exist.");
@@ -52,6 +52,7 @@ public class IncomeTransactionService : IIncomeTransactionService
             Amount = model.Amount,
             MoneyAccountId = model.MoneyAccountId,
             IncomeTypeId = model.IncomeTypeId,
+            UserId = model.UserId,
             Name = model.Name,
             Comment = model.Comment
         };
@@ -75,7 +76,7 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task<List<IncomeTransactionModel>> GetAllIncomeTransactionsAsync(Guid userId, int pageIndex, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId)
+            .Where(it => it.UserId == userId)
             .OrderByDescending(it => it.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -87,6 +88,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Amount = it.Amount,
                 MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
+                UserId = it.UserId,
                 Comment = it.Comment
             }).ToListAsync();
 
@@ -96,7 +98,7 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task<List<IncomeTransactionModel>> Get10LastIncomeTransactionsAsync(Guid userId)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId)
+            .Where(it => it.UserId == userId)
             .OrderByDescending(it => it.TransactionDate)
             .Take(10)
             .Select(it => new IncomeTransactionModel
@@ -106,6 +108,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Amount = it.Amount,
                 MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
+                UserId = it.UserId,
                 Name = it.Name,
                 Comment = it.Comment
             }).ToListAsync();
@@ -116,7 +119,7 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task<List<IncomeTransactionModel>> GetIncomeTransactionsByAccAsync(Guid userId, Guid moneyAccountId, int pageIndex, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId && it.MoneyAccount.Id == moneyAccountId)
+            .Where(it => it.UserId == userId && it.MoneyAccount.Id == moneyAccountId)
             .OrderByDescending(it => it.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -127,6 +130,7 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Amount = it.Amount,
                 MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
+                UserId = it.UserId,
                 Name = it.Name,
                 Comment = it.Comment
             }).ToListAsync();
@@ -142,7 +146,7 @@ public class IncomeTransactionService : IIncomeTransactionService
         ValidationHelper.EnsureEntityFound(user);
 
         var incomeTransaction = await _context.IncomeTransactions
-            .Where(it => it.MoneyAccount.UserId == userId && it.Id == incomeTransactionId)
+            .Where(it => it.UserId == userId && it.Id == incomeTransactionId)
             .FirstOrDefaultAsync();
         
         incomeTransaction.Comment = newComment;
