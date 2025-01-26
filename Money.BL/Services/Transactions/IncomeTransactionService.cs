@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Money.Common.Exceptions;
 using Money.BL.Interfaces.Transactions;
 using Money.BL.Interfaces.MoneyAccount;
-using Org.BouncyCastle.Crypto.Prng;
 
 namespace Money.BL.Services.Transactions;
 
@@ -137,13 +136,10 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task UpdateIncomeTransactionCommentAsync(Guid userId, Guid incomeTransactionId, string newComment)
     {
         BaseValidator.ValidateString(newComment, maxLength: 250);
-        var user = _context.Users.AsNoTracking()
-            .FirstOrDefault(u => u.Id == userId);
-        ValidationHelper.EnsureEntityFound(user);
 
         var incomeTransaction = await _context.IncomeTransactions
-            .Where(it => it.MoneyAccount.UserId == userId && it.Id == incomeTransactionId)
-            .FirstOrDefaultAsync();
+            .Include(et => et.MoneyAccount)
+            .Where(it => it.MoneyAccount.UserId == userId && it.Id == incomeTransactionId).FirstOrDefaultAsync();
         
         incomeTransaction.Comment = newComment;
         await _context.SaveChangesAsync();

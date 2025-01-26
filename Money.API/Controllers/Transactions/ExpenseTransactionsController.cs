@@ -55,7 +55,7 @@ public class ExpenseTransactionsController : ControllerBase
         return Ok(expenseTransactions);
     }
 
-    [HttpPut]
+    [HttpPut("{expenseTransactionId}/comment")]
     [Authorize]
     public async Task<IActionResult> UpdateExpenseTransactionComment(Guid expenseTransactionId, string newComment)
     {

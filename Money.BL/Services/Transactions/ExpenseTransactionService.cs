@@ -47,12 +47,12 @@ public class ExpenseTransactionService : IExpenseTransactionService
 
         var newExpenseTransaction = new ExpenseTransactionEntity
         {
+            Name = model.Name,
+            Comment = model.Comment,
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
             MoneyAccountId = model.MoneyAccountId,
-            ExpenseTypeId = model.ExpenseTypeId,
-            Name = model.Name,
-            Comment = model.Comment
+            ExpenseTypeId = model.ExpenseTypeId
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -136,13 +136,8 @@ public class ExpenseTransactionService : IExpenseTransactionService
     public async Task UpdateExpenseTransactionCommentAsync (Guid userId, Guid expenseTransactionId, string newComment)
     {
         BaseValidator.ValidateString(newComment, maxLength: 250);
-        var user = _context.Users.AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        ValidationHelper.EnsureEntityFound(user);
 
-        var expenseTransaction = await _context.ExpenseTransactions
-            .Where(et => et.MoneyAccount.UserId == userId && et.Id == expenseTransactionId)
-            .FirstOrDefaultAsync();
+        var expenseTransaction = await _context.ExpenseTransactions.Include(et => et.MoneyAccount).Where(et => et.MoneyAccount.UserId == userId && et.Id == expenseTransactionId).FirstOrDefaultAsync();
         
         expenseTransaction.Comment = newComment;
         await _context.SaveChangesAsync();
