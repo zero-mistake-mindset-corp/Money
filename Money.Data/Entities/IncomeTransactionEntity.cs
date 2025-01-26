@@ -9,7 +9,7 @@ public class IncomeTransactionEntity
     public decimal Amount { get; set; }
     public Guid UserId { get; set; }
     public virtual UserEntity User { get; set; }
-    public Guid MoneyAccountId { get; set; }
+    public Guid? MoneyAccountId { get; set; }
     public virtual MoneyAccountEntity MoneyAccount { get; set; }
     public Guid? IncomeTypeId { get; set; }
     public virtual IncomeTypeEntity IncomeType { get; set; }

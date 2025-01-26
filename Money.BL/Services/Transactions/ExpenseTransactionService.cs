@@ -52,7 +52,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
             MoneyAccountId = model.MoneyAccountId,
-            ExpenseTypeId = model.ExpenseTypeId
+            ExpenseTypeId = model.ExpenseTypeId,
             UserId = model.UserId,
         };
 
