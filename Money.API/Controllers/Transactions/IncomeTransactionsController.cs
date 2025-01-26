@@ -37,15 +37,6 @@ public class IncomeTransactionsController : ControllerBase
         return Ok(incomeTransactions);
     }
 
-    [HttpGet("latest")]
-    [Authorize]
-    public async Task<IActionResult> GetLatestIncomeTransactions()
-    {
-        var userId = _currentUserService.GetUserId();
-        var incomeTransactions = await _incomeTransactionService.Get10LastIncomeTransactionsAsync(userId);
-        return Ok(incomeTransactions);
-    }
-
     [HttpGet("{moneyAccountId}")]
     [Authorize]
     public async Task<IActionResult> GetIncomeTransactionsByAcc(Guid moneyAccountId, int pageIndex = 1, int pageSize = 10)
