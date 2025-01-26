@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Money.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Money.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250118195722_ExpenseTransaction")]
+    partial class ExpenseTransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,13 +62,10 @@ namespace Money.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("Comment")
-                        .HasColumnType("text");
-
                     b.Property<Guid?>("ExpenseTypeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("MoneyAccountId")
+                    b.Property<Guid>("MoneyAccountId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -74,16 +74,11 @@ namespace Money.Data.Migrations
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ExpenseTypeId");
 
                     b.HasIndex("MoneyAccountId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("ExpenseTransactions");
                 });
@@ -116,13 +111,10 @@ namespace Money.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<string>("Comment")
-                        .HasColumnType("text");
-
                     b.Property<Guid?>("IncomeTypeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("MoneyAccountId")
+                    b.Property<Guid>("MoneyAccountId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -131,16 +123,11 @@ namespace Money.Data.Migrations
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IncomeTypeId");
 
                     b.HasIndex("MoneyAccountId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("IncomeTransactions");
                 });
@@ -208,47 +195,6 @@ namespace Money.Data.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Money.Data.Entities.TransferEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("ReceivingMoneyAccountId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("SendingMoneyAccountId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("TrackingDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("TransferDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceivingMoneyAccountId");
-
-                    b.HasIndex("SendingMoneyAccountId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Transfers");
-                });
-
             modelBuilder.Entity("Money.Data.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -294,21 +240,14 @@ namespace Money.Data.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Money.Data.Entities.MoneyAccountEntity", "MoneyAccount")
-                        .WithMany("ExpenseTransactions")
+                        .WithMany()
                         .HasForeignKey("MoneyAccountId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Money.Data.Entities.UserEntity", "User")
-                        .WithMany("ExpenseTransactions")
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ExpenseType");
 
                     b.Navigation("MoneyAccount");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Money.Data.Entities.ExpenseTypeEntity", b =>
@@ -332,19 +271,12 @@ namespace Money.Data.Migrations
                     b.HasOne("Money.Data.Entities.MoneyAccountEntity", "MoneyAccount")
                         .WithMany("IncomeTransactions")
                         .HasForeignKey("MoneyAccountId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Money.Data.Entities.UserEntity", "User")
-                        .WithMany("IncomeTransactions")
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("IncomeType");
 
                     b.Navigation("MoneyAccount");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Money.Data.Entities.IncomeTypeEntity", b =>
@@ -380,31 +312,6 @@ namespace Money.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Money.Data.Entities.TransferEntity", b =>
-                {
-                    b.HasOne("Money.Data.Entities.MoneyAccountEntity", "ReceivingMoneyAccount")
-                        .WithMany("ReceivedTransfers")
-                        .HasForeignKey("ReceivingMoneyAccountId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Money.Data.Entities.MoneyAccountEntity", "SendingMoneyAccount")
-                        .WithMany("SentTransfers")
-                        .HasForeignKey("SendingMoneyAccountId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("Money.Data.Entities.UserEntity", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ReceivingMoneyAccount");
-
-                    b.Navigation("SendingMoneyAccount");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Money.Data.Entities.ExpenseTypeEntity", b =>
                 {
                     b.Navigation("ExpenseTransactions");
@@ -417,24 +324,14 @@ namespace Money.Data.Migrations
 
             modelBuilder.Entity("Money.Data.Entities.MoneyAccountEntity", b =>
                 {
-                    b.Navigation("ExpenseTransactions");
-
                     b.Navigation("IncomeTransactions");
-
-                    b.Navigation("ReceivedTransfers");
-
-                    b.Navigation("SentTransfers");
                 });
 
             modelBuilder.Entity("Money.Data.Entities.UserEntity", b =>
                 {
                     b.Navigation("ConfirmationCodes");
 
-                    b.Navigation("ExpenseTransactions");
-
                     b.Navigation("ExpenseTypes");
-
-                    b.Navigation("IncomeTransactions");
 
                     b.Navigation("IncomeTypes");
 

@@ -27,17 +27,19 @@ public class IncomeTransactionService : IIncomeTransactionService
     {
         ValidationHelper.ValidateMoneyValue(model.Amount);
         BaseValidator.ValidateString(model.Name, maxLength: 100);
+        BaseValidator.ValidateString(model.Comment, maxLength: 250);
+        BaseValidator.ValidateDate(model.TransactionDate);
 
         var user = await _context.Users.AsNoTracking().Where(u => u.Id == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
 
-        var isMoneyAccountExist = await _context.MoneyAccounts.AnyAsync(ma => ma.UserId == user.Id && ma.Id == model.MoneyAccountId);
+        var isMoneyAccountExist = await _context.MoneyAccounts.Where(ma => ma.UserId == user.Id && ma.Id == model.MoneyAccountId).AnyAsync();
         if (isMoneyAccountExist == false)
         {
             throw new NotFoundException("Money account with this ID does not exist.");
         }
 
-        var isIncomeTypeExist = await _context.IncomeTypes.AnyAsync(it => it.UserId == userId && it.Id == model.IncomeTypeId);
+        var isIncomeTypeExist = await _context.IncomeTypes.Where(itype => itype.UserId == userId && itype.Id == model.IncomeTypeId).AnyAsync();
         if (isIncomeTypeExist == false)
         {
             throw new NotFoundException("Income type with this ID does not exist.");
@@ -45,11 +47,13 @@ public class IncomeTransactionService : IIncomeTransactionService
 
         var newIncomeTransaction = new IncomeTransactionEntity
         {
+            Name = model.Name,
+            Comment = model.Comment,
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
             MoneyAccountId = model.MoneyAccountId,
             IncomeTypeId = model.IncomeTypeId,
-            Name = model.Name,
+            UserId = userId
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -71,7 +75,7 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task<List<IncomeTransactionModel>> GetAllIncomeTransactionsAsync(Guid userId, int pageIndex, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId)
+            .Where(it => it.UserId == userId)
             .OrderByDescending(it => it.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -81,27 +85,10 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Name = it.Name,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.MoneyAccountId,
-                IncomeTypeId = it.IncomeTypeId
-            }).ToListAsync();
-
-        return incomeTransactions;
-    }
-
-    public async Task<List<IncomeTransactionModel>> Get10LastIncomeTransactionsAsync(Guid userId)
-    {
-        var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId)
-            .OrderByDescending(it => it.TransactionDate)
-            .Take(10)
-            .Select(it => new IncomeTransactionModel
-            {
-                Id = it.Id,
-                TransactionDate = it.TransactionDate,
-                Amount = it.Amount,
-                AccountId = it.MoneyAccountId,
+                MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
-                Name = it.Name
+                UserId = it.UserId,
+                Comment = it.Comment
             }).ToListAsync();
 
         return incomeTransactions;
@@ -110,7 +97,7 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task<List<IncomeTransactionModel>> GetIncomeTransactionsByAccAsync(Guid userId, Guid moneyAccountId, int pageIndex, int pageSize)
     {
         var incomeTransactions = await _context.IncomeTransactions.AsNoTracking()
-            .Where(it => it.MoneyAccount.UserId == userId && it.MoneyAccount.Id == moneyAccountId)
+            .Where(it => it.UserId == userId && it.MoneyAccount.Id == moneyAccountId)
             .OrderByDescending(it => it.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -119,11 +106,22 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Id = it.Id,
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
-                AccountId = it.MoneyAccountId,
+                MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
-                Name = it.Name
+                UserId = it.UserId,
+                Name = it.Name,
+                Comment = it.Comment
             }).ToListAsync();
 
         return incomeTransactions;
+    }
+
+    public async Task UpdateIncomeTransactionCommentAsync(Guid userId, Guid incomeTransactionId, string newComment)
+    {
+        BaseValidator.ValidateString(newComment, maxLength: 250);
+        var incomeTransaction = await _context.IncomeTransactions.Where(it => it.UserId == userId && it.Id == incomeTransactionId).FirstOrDefaultAsync();
+        
+        incomeTransaction.Comment = newComment;
+        await _context.SaveChangesAsync();
     }
 }

@@ -42,6 +42,14 @@ public static class BaseValidator
         }
     }
 
+    public static void ValidateDate(DateTime date)
+    {
+        if (date > DateTime.UtcNow)
+        {
+            throw new InvalidInputException("Cannot assign future date.");
+        }
+    }
+
     public static void ValidateEmail(string email)
     {
         if (string.IsNullOrWhiteSpace(email))

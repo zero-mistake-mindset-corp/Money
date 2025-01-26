@@ -1,6 +1,6 @@
 namespace Money.Data.Entities;
 
-public class IncomeTransactionEntity
+public class ExpenseTransactionEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
@@ -11,6 +11,6 @@ public class IncomeTransactionEntity
     public virtual UserEntity User { get; set; }
     public Guid? MoneyAccountId { get; set; }
     public virtual MoneyAccountEntity MoneyAccount { get; set; }
-    public Guid? IncomeTypeId { get; set; }
-    public virtual IncomeTypeEntity IncomeType { get; set; }
+    public Guid? ExpenseTypeId { get; set; }
+    public virtual ExpenseTypeEntity ExpenseType { get; set; }
 }
