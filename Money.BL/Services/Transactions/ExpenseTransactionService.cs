@@ -27,6 +27,8 @@ public class ExpenseTransactionService : IExpenseTransactionService
     {
         ValidationHelper.ValidateMoneyValue(model.Amount);
         BaseValidator.ValidateString(model.Name, maxLength: 100);
+        BaseValidator.ValidateString(model.Comment, maxLength: 250);
+        BaseValidator.ValidateDate(model.TransactionDate);
 
         var user = await _context.Users.AsNoTracking().Where(u => u.Id == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
@@ -50,6 +52,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
             MoneyAccountId = model.MoneyAccountId,
             ExpenseTypeId = model.ExpenseTypeId,
             Name = model.Name,
+            Comment = model.Comment
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -82,7 +85,8 @@ public class ExpenseTransactionService : IExpenseTransactionService
                 TransactionDate = et.TransactionDate,
                 Amount = et.Amount,
                 MoneyAccountId = et.MoneyAccountId,
-                ExpenseTypeId = et.ExpenseTypeId
+                ExpenseTypeId = et.ExpenseTypeId,
+                Comment = et.Comment
             }).ToListAsync();
 
         return expenseTransactions;
@@ -100,8 +104,9 @@ public class ExpenseTransactionService : IExpenseTransactionService
                 TransactionDate = et.TransactionDate,
                 Amount = et.Amount,
                 MoneyAccountId = et.MoneyAccountId,
-               ExpenseTypeId = et.ExpenseTypeId,
-                Name = et.Name
+                ExpenseTypeId = et.ExpenseTypeId,
+                Name = et.Name,
+                Comment = et.Comment
             }).ToListAsync();
 
         return expenseTransactions;
@@ -121,9 +126,26 @@ public class ExpenseTransactionService : IExpenseTransactionService
                 Amount = et.Amount,
                 MoneyAccountId = et.MoneyAccountId,
                 ExpenseTypeId = et.ExpenseTypeId,
-                Name = et.Name
+                Name = et.Name,
+                Comment = et.Comment
             }).ToListAsync();
 
         return expenseTransactions;
     }
+
+    public async Task UpdateExpenseTransactionCommentAsync (Guid userId, Guid expenseTransactionId, string newComment)
+    {
+        BaseValidator.ValidateString(newComment, maxLength: 250);
+        var user = _context.Users.AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId);
+        ValidationHelper.EnsureEntityFound(user);
+
+        var expenseTransaction = await _context.ExpenseTransactions
+            .Where(et => et.MoneyAccount.UserId == userId && et.Id == expenseTransactionId)
+            .FirstOrDefaultAsync();
+        
+        expenseTransaction.Comment = newComment;
+        await _context.SaveChangesAsync();
+    }
+
 }

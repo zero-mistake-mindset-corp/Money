@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Money.Common.Exceptions;
 using Money.BL.Interfaces.Transactions;
 using Money.BL.Interfaces.MoneyAccount;
+using Org.BouncyCastle.Crypto.Prng;
 
 namespace Money.BL.Services.Transactions;
 
@@ -27,6 +28,8 @@ public class IncomeTransactionService : IIncomeTransactionService
     {
         ValidationHelper.ValidateMoneyValue(model.Amount);
         BaseValidator.ValidateString(model.Name, maxLength: 100);
+        BaseValidator.ValidateString(model.Comment, maxLength: 250);
+        BaseValidator.ValidateDate(model.TransactionDate);
 
         var user = await _context.Users.AsNoTracking().Where(u => u.Id == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
@@ -50,6 +53,7 @@ public class IncomeTransactionService : IIncomeTransactionService
             MoneyAccountId = model.MoneyAccountId,
             IncomeTypeId = model.IncomeTypeId,
             Name = model.Name,
+            Comment = model.Comment
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -82,7 +86,8 @@ public class IncomeTransactionService : IIncomeTransactionService
                 TransactionDate = it.TransactionDate,
                 Amount = it.Amount,
                 MoneyAccountId = it.MoneyAccountId,
-                IncomeTypeId = it.IncomeTypeId
+                IncomeTypeId = it.IncomeTypeId,
+                Comment = it.Comment
             }).ToListAsync();
 
         return incomeTransactions;
@@ -101,7 +106,8 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Amount = it.Amount,
                 MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
-                Name = it.Name
+                Name = it.Name,
+                Comment = it.Comment
             }).ToListAsync();
 
         return incomeTransactions;
@@ -121,9 +127,25 @@ public class IncomeTransactionService : IIncomeTransactionService
                 Amount = it.Amount,
                 MoneyAccountId = it.MoneyAccountId,
                 IncomeTypeId = it.IncomeTypeId,
-                Name = it.Name
+                Name = it.Name,
+                Comment = it.Comment
             }).ToListAsync();
 
         return incomeTransactions;
+    }
+
+    public async Task UpdateIncomeTransactionCommentAsync(Guid userId, Guid incomeTransactionId, string newComment)
+    {
+        BaseValidator.ValidateString(newComment, maxLength: 250);
+        var user = _context.Users.AsNoTracking()
+            .FirstOrDefault(u => u.Id == userId);
+        ValidationHelper.EnsureEntityFound(user);
+
+        var incomeTransaction = await _context.IncomeTransactions
+            .Where(it => it.MoneyAccount.UserId == userId && it.Id == incomeTransactionId)
+            .FirstOrDefaultAsync();
+        
+        incomeTransaction.Comment = newComment;
+        await _context.SaveChangesAsync();
     }
 }
