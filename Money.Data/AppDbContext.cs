@@ -24,6 +24,18 @@ public class AppDbContext : DbContext
             .WithMany(etype => etype.ExpenseTransactions)
             .HasForeignKey(et => et.ExpenseTypeId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<TransferEntity>()
+            .HasOne(t => t.SendingMoneyAccount)
+            .WithMany(ma => ma.SentTransfers)
+            .HasForeignKey(t => t.SendingMoneyAccountId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<TransferEntity>()
+            .HasOne(t => t.ReceivingMoneyAccount)
+            .WithMany(ma => ma.ReceivedTransfers)
+            .HasForeignKey(t => t.ReceivingMoneyAccountId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 
     public DbSet<UserEntity> Users { get; set; }
@@ -34,4 +46,5 @@ public class AppDbContext : DbContext
     public DbSet<ExpenseTypeEntity> ExpenseTypes { get; set; }
     public DbSet<IncomeTransactionEntity> IncomeTransactions { get; set; }
     public DbSet<ExpenseTransactionEntity> ExpenseTransactions { get; set; }
+    public DbSet<TransferEntity> Transfers { get; set; }
 }

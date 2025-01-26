@@ -141,10 +141,6 @@ public class IncomeTransactionService : IIncomeTransactionService
     public async Task UpdateIncomeTransactionCommentAsync(Guid userId, Guid incomeTransactionId, string newComment)
     {
         BaseValidator.ValidateString(newComment, maxLength: 250);
-        var user = _context.Users.AsNoTracking()
-            .FirstOrDefault(u => u.Id == userId);
-        ValidationHelper.EnsureEntityFound(user);
-
         var incomeTransaction = await _context.IncomeTransactions
             .Where(it => it.UserId == userId && it.Id == incomeTransactionId)
             .FirstOrDefaultAsync();
