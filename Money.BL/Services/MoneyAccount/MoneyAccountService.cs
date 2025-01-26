@@ -76,8 +76,8 @@ public class MoneyAccountService : IMoneyAccountService
         else
         {
             account.Balance -= amount;
+            ValidationHelper.ValidateMoneyValue(account.Balance);
         }
-
         await _context.SaveChangesAsync();
     }
 }

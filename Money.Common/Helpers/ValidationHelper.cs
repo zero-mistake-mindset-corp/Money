@@ -55,4 +55,12 @@ public static class ValidationHelper
             throw new InvalidInputException("Money value cannot be negative.");
         }
     }
+
+    public static void ValidateTransfer(decimal balance, decimal transferValue)
+    {
+        if (balance < transferValue)
+        {
+            throw new InvalidInputException("Transfer value cannot be greater than account balance");
+        }
+    }
 }
