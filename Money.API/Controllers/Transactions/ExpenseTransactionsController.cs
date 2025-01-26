@@ -37,15 +37,6 @@ public class ExpenseTransactionsController : ControllerBase
         return Ok(expenseTransactions);
     }
 
-    [HttpGet("latest")]
-    [Authorize]
-    public async Task<IActionResult> GetLatestExpenseTransactions()
-    {
-        var userId = _currentUserService.GetUserId();
-        var expenseTransactions = await _expenseTransactionService.Get10LastExpenseTransactionsAsync(userId);
-        return Ok(expenseTransactions);
-    }
-
     [HttpGet("{moneyAccountId}")]
     [Authorize]
     public async Task<IActionResult> GetExpenseTransactionsByAcc(Guid moneyAccountId, int pageIndex = 1, int pageSize = 10)

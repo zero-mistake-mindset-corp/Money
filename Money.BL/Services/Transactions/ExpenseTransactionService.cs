@@ -33,13 +33,13 @@ public class ExpenseTransactionService : IExpenseTransactionService
         var user = await _context.Users.AsNoTracking().Where(u => u.Id == userId).FirstOrDefaultAsync();
         ValidationHelper.EnsureEntityFound(user);
 
-        var isMoneyAccountExist = await _context.MoneyAccounts.AnyAsync(ma => ma.UserId == user.Id && ma.Id == model.MoneyAccountId);
+        var isMoneyAccountExist = await _context.MoneyAccounts.Where(ma => ma.UserId == user.Id && ma.Id == model.MoneyAccountId).AnyAsync();
         if (isMoneyAccountExist == false)
         {
             throw new NotFoundException("Money account with this ID does not exist.");
         }
 
-        var isExpenseTypeExist = await _context.ExpenseTypes.AnyAsync(et => et.UserId == userId && et.Id == model.ExpenseTypeId);
+        var isExpenseTypeExist = await _context.ExpenseTypes.Where(etype => etype.UserId == userId && etype.Id == model.ExpenseTypeId).AnyAsync();
         if (isExpenseTypeExist == false)
         {
             throw new NotFoundException("Expense type with this ID does not exist.");
@@ -52,7 +52,8 @@ public class ExpenseTransactionService : IExpenseTransactionService
             TransactionDate = model.TransactionDate,
             Amount = model.Amount,
             MoneyAccountId = model.MoneyAccountId,
-            ExpenseTypeId = model.ExpenseTypeId
+            ExpenseTypeId = model.ExpenseTypeId,
+            UserId = userId,
         };
 
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -74,7 +75,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
     public async Task<List<ExpenseTransactionModel>> GetAllExpenseTransactionsAsync(Guid userId, int pageIndex, int pageSize)
     {
         var expenseTransactions = await _context.ExpenseTransactions.AsNoTracking()
-            .Where(et => et.MoneyAccount.UserId == userId)
+            .Where(et => et.UserId == userId)
             .OrderByDescending(et => et.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -86,26 +87,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
                 Amount = et.Amount,
                 MoneyAccountId = et.MoneyAccountId,
                 ExpenseTypeId = et.ExpenseTypeId,
-                Comment = et.Comment
-            }).ToListAsync();
-
-        return expenseTransactions;
-    }
-
-    public async Task<List<ExpenseTransactionModel>> Get10LastExpenseTransactionsAsync(Guid userId)
-    {
-        var expenseTransactions = await _context.ExpenseTransactions.AsNoTracking()
-            .Where(et => et.MoneyAccount.UserId == userId)
-            .OrderByDescending(et => et.TransactionDate)
-            .Take(10)
-            .Select(et => new ExpenseTransactionModel
-            {
-                Id = et.Id,
-                TransactionDate = et.TransactionDate,
-                Amount = et.Amount,
-                MoneyAccountId = et.MoneyAccountId,
-                ExpenseTypeId = et.ExpenseTypeId,
-                Name = et.Name,
+                UserId = et.UserId,
                 Comment = et.Comment
             }).ToListAsync();
 
@@ -115,7 +97,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
     public async Task<List<ExpenseTransactionModel>> GetExpenseTransactionsByAccAsync(Guid userId, Guid moneyAccountId, int pageIndex, int pageSize)
     {
         var expenseTransactions = await _context.ExpenseTransactions.AsNoTracking()
-            .Where(et => et.MoneyAccount.UserId == userId && et.MoneyAccount.Id == moneyAccountId)
+            .Where(et => et.UserId == userId && et.MoneyAccount.Id == moneyAccountId)
             .OrderByDescending(et => et.TransactionDate)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
@@ -126,6 +108,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
                 Amount = et.Amount,
                 MoneyAccountId = et.MoneyAccountId,
                 ExpenseTypeId = et.ExpenseTypeId,
+                UserId = et.UserId,
                 Name = et.Name,
                 Comment = et.Comment
             }).ToListAsync();
@@ -136,8 +119,7 @@ public class ExpenseTransactionService : IExpenseTransactionService
     public async Task UpdateExpenseTransactionCommentAsync (Guid userId, Guid expenseTransactionId, string newComment)
     {
         BaseValidator.ValidateString(newComment, maxLength: 250);
-
-        var expenseTransaction = await _context.ExpenseTransactions.Include(et => et.MoneyAccount).Where(et => et.MoneyAccount.UserId == userId && et.Id == expenseTransactionId).FirstOrDefaultAsync();
+        var expenseTransaction = await _context.ExpenseTransactions.Where(et => et.UserId == userId && et.Id == expenseTransactionId).FirstOrDefaultAsync();
         
         expenseTransaction.Comment = newComment;
         await _context.SaveChangesAsync();

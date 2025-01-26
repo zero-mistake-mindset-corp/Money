@@ -18,11 +18,23 @@ public class AppDbContext : DbContext
             .WithMany(itype => itype.IncomeTransactions)
             .HasForeignKey(it => it.IncomeTypeId)
             .OnDelete(DeleteBehavior.SetNull);
-        
+
+        modelBuilder.Entity<IncomeTransactionEntity>()
+            .HasOne(it => it.MoneyAccount)
+            .WithMany(ma => ma.IncomeTransactions)
+            .HasForeignKey(it => it.MoneyAccountId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         modelBuilder.Entity<ExpenseTransactionEntity>()
             .HasOne(et => et.ExpenseType)
             .WithMany(etype => etype.ExpenseTransactions)
             .HasForeignKey(et => et.ExpenseTypeId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<ExpenseTransactionEntity>()
+            .HasOne(et => et.MoneyAccount)
+            .WithMany(ma => ma.ExpenseTransactions)
+            .HasForeignKey(et => et.MoneyAccountId)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<TransferEntity>()
