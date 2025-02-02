@@ -9,4 +9,6 @@ public interface IUserProfileService
     Task RequestTwoFactorAuthChangeAsync(Guid userId, bool enable);
     Task ConfirmTwoFactorAuthChangeAsync(Guid userId, string code);
     Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword);
+    Task RequestEmailChangingAsync(Guid userId, string newEmail);
+    Task ConfirmEmailChangingAsync(Guid userId, string codeValue, string newEmail);
 }

@@ -115,4 +115,51 @@ public class UserProfileService : IUserProfileService
         user.PasswordHash = InformationHasher.HashText(newPassword);
         await _context.SaveChangesAsync();
     }
+
+    public async Task RequestEmailChangingAsync(Guid userId, string newEmail)
+    {
+        var user = await _context.Users
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+        ValidationHelper.EnsureEntityFound(user);
+        BaseValidator.ValidateEmail(newEmail);
+
+        var confirmationCode = new ConfirmationCodeEntity
+        {
+            Value = CodeCreator.GenerateCode(),
+            Expiration = DateTime.UtcNow.AddMinutes(5),
+            Metadata = newEmail,
+            UserId = userId,
+        };
+        
+        _context.ConfirmationCodes.Add(confirmationCode);
+        await _context.SaveChangesAsync();
+        var emailTemplateModel = new EmailTemplateModel
+        {
+            UserName = user.Username,
+            Code = confirmationCode.Value,
+            NewEmail = newEmail,
+        };
+
+        await _emailService.SendAsync(user.Email, EmailTemplateType.EmailChange, emailTemplateModel);
+    }
+
+    public async Task ConfirmEmailChangingAsync(Guid userId, string codeValue, string newEmail)
+    {
+        var user = await _context.Users
+            .Include(u => u.ConfirmationCodes)
+            .Where(u => u.Id == userId)
+            .FirstOrDefaultAsync();
+        ValidationHelper.EnsureEntityFound(user);
+        
+        var code = user.ConfirmationCodes.FirstOrDefault(cc => cc.Value == codeValue);
+        if (code == null || code.IsUsed || code.Expiration < DateTime.UtcNow || code.Metadata != newEmail)
+        {
+            throw new InvalidInputException("Invalid confirmation code");
+        }
+
+        user.Email = newEmail;
+        code.IsUsed = true;
+        await _context.SaveChangesAsync();
+    }
 }

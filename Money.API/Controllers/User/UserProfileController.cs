@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Money.BL.Interfaces.User;
 using Money.BL.Models.UserAccount;
-using Money.BL.Services.User;
 
 namespace Money.API.Controllers.User;
 
@@ -37,7 +36,7 @@ public class UserProfileController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("2fa")]
+    [HttpPut("2fa")]
     [Authorize]
     public async Task<IActionResult> Request2FaChange(bool enable)
     {
@@ -46,7 +45,7 @@ public class UserProfileController : ControllerBase
         return Created();
     }
 
-    [HttpPost("2fa/confirmation")]
+    [HttpPut("2fa/confirmation")]
     [Authorize]
     public async Task<IActionResult> Request2FaConfirmation(string code)
     {
@@ -61,6 +60,24 @@ public class UserProfileController : ControllerBase
     {
         var userId = _currentUserService.GetUserId();
         await _profileService.ChangePasswordAsync(userId, updatePasswordModel.OldPassword, updatePasswordModel.NewPassword);
+        return Ok();
+    }
+
+    [HttpPut("email-changing")]
+    [Authorize]
+    public async Task<IActionResult> UpdateEmail(string newEmail)
+    {
+        var userId = _currentUserService.GetUserId();
+        await _profileService.RequestEmailChangingAsync(userId, newEmail);
+        return Created();
+    }
+
+    [HttpPut("email-changing/confirmation")]
+    [Authorize]
+    public async Task<IActionResult> ConfirmEmailChanging(string code, string newEmail)
+    {
+        var userId = _currentUserService.GetUserId();
+        await _profileService.ConfirmEmailChangingAsync(userId, code, newEmail);
         return Ok();
     }
 }
