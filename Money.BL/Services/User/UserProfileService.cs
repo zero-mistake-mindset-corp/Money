@@ -101,4 +101,18 @@ public class UserProfileService : IUserProfileService
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword)
+    {
+        var user = await _context.Users.Where(u => u.Id == userId).FirstOrDefaultAsync();
+        ValidationHelper.EnsureEntityFound(user);
+        BaseValidator.ValidatePassword(newPassword);
+        if (InformationHasher.VerifyText(oldPassword, user.PasswordHash) == false)
+        {
+            throw new PermissionException("Invalid old password");
+        }
+        
+        user.PasswordHash = InformationHasher.HashText(newPassword);
+        await _context.SaveChangesAsync();
+    }
 }

@@ -8,4 +8,5 @@ public interface IUserProfileService
     Task<GetUserProfileModel> GetUserProfile(Guid userId);
     Task RequestTwoFactorAuthChangeAsync(Guid userId, bool enable);
     Task ConfirmTwoFactorAuthChangeAsync(Guid userId, string code);
+    Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword);
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Money.BL.Interfaces.User;
+using Money.BL.Models.UserAccount;
 using Money.BL.Services.User;
 
 namespace Money.API.Controllers.User;
@@ -51,6 +52,15 @@ public class UserProfileController : ControllerBase
     {
         var userId = _currentUserService.GetUserId();
         await _profileService.ConfirmTwoFactorAuthChangeAsync(userId, code);
+        return Ok();
+    }
+
+    [HttpPut("password")]
+    [Authorize]
+    public async Task<IActionResult> UpdatePassword(UpdatePasswordModel updatePasswordModel)
+    {
+        var userId = _currentUserService.GetUserId();
+        await _profileService.ChangePasswordAsync(userId, updatePasswordModel.OldPassword, updatePasswordModel.NewPassword);
         return Ok();
     }
 }
