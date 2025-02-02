@@ -35,4 +35,22 @@ public class UserProfileController : ControllerBase
         await _profileService.UpdateUsernameAsync(userId, username);
         return Ok();
     }
+
+    [HttpPost("2fa")]
+    [Authorize]
+    public async Task<IActionResult> Request2FaChange(bool enable)
+    {
+        var userId = _currentUserService.GetUserId();
+        await _profileService.RequestTwoFactorAuthChangeAsync(userId, enable);
+        return Created();
+    }
+
+    [HttpPost("2fa/confirmation")]
+    [Authorize]
+    public async Task<IActionResult> Request2FaConfirmation(string code)
+    {
+        var userId = _currentUserService.GetUserId();
+        await _profileService.ConfirmTwoFactorAuthChangeAsync(userId, code);
+        return Ok();
+    }
 }
