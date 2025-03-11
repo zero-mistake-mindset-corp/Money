@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.Common", "Money.Commo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.BL", "Money.BL\Money.BL.csproj", "{9411F800-3517-49B8-AE53-965374B0FD0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.Infrastructure", "Money.Data\Money.Infrastructure.csproj", "{8E271C9E-989A-4830-B7E1-0939B0C1FE47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Money.Infrastructure", "Money.Infrastructure\Money.Infrastructure.csproj", "{8E271C9E-989A-4830-B7E1-0939B0C1FE47}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

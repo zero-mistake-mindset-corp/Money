@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Money.Common\Money.Common.csproj" />
-    <ProjectReference Include="..\Money.Data\Money.Infrastructure.csproj" />
+    <ProjectReference Include="..\Money.Infrastructure\Money.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
